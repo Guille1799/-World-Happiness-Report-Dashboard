@@ -92,11 +92,6 @@ FIGURE21_X_LABELS = {
     "Generosity": "Explained by: generosity",
 }
 
-# Cross-section: scatter (left) vs map (right). Slightly wider map column so the choropleth stays readable.
-_SCATTER_MAP_COL_RATIO = [0.42, 0.58]
-_CROSS_PLOT_HEIGHT = 520
-
-
 def _inject_app_styles() -> None:
     st.markdown(
         """
@@ -750,7 +745,7 @@ using the official Figure 2.1 workbook).
 
     st.divider()
 
-    sm_l, sm_r = st.columns(_SCATTER_MAP_COL_RATIO)
+    sm_l, sm_r = st.columns(2)
     with sm_l:
         sm_h, sm_t = st.columns([0.88, 0.12])
         with sm_h:
@@ -820,7 +815,6 @@ using the official Figure 2.1 workbook).
         )
     sc.update_layout(
         title=f"Life evaluation vs selected driver · {year} · r ≈ {r_str}",
-        height=_CROSS_PLOT_HEIGHT,
         paper_bgcolor="#ffffff",
         plot_bgcolor="#fafbfc",
         xaxis_title=x_label,
@@ -851,13 +845,12 @@ using the official Figure 2.1 workbook).
             zmin=happy_min,
             zmax=happy_max,
             marker_line_width=0.3,
-            colorbar=dict(title="Life evaluation", thickness=14, len=0.38),
+            colorbar=dict(title="Life evaluation", thickness=12, len=0.5),
             hovertemplate="<b>%{text}</b><br>Life evaluation: %{z:.2f}<extra></extra>",
         )
     )
     mp.update_layout(
         title=f"Geographic distribution · {year}",
-        height=_CROSS_PLOT_HEIGHT,
         geo=dict(
             showframe=False,
             projection_type="natural earth",
@@ -865,15 +858,15 @@ using the official Figure 2.1 workbook).
             landcolor="#e2e8f0",
             showocean=True,
             oceancolor="#f8fafc",
-            domain=dict(x=[0.0, 0.92], y=[0.0, 1.0]),
         ),
-        margin=dict(l=0, r=10, t=50, b=0),
+        margin=dict(l=0, r=0, t=50, b=0),
+        height=420,
     )
 
     iso_to_country = (
         df_y.drop_duplicates("iso_a3").set_index("iso_a3")["Country"].to_dict() if len(df_y) else {}
     )
-    g1, g2 = st.columns(_SCATTER_MAP_COL_RATIO)
+    g1, g2 = st.columns(2)
     with g1:
         st.plotly_chart(sc, use_container_width=True, config=plotly_config())
     with g2:
