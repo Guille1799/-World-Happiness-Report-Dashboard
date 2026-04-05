@@ -108,7 +108,7 @@ def _inject_app_styles() -> None:
 def _inline_tip(lang: str, key: str) -> None:
     """ⓘ opens a popover with full markdown; hover shows Streamlit help on the control."""
     body = tr(lang, key)
-    with st.popover("ⓘ", help=tr(lang, "tip_click_details"), width="stretch"):
+    with st.popover("ⓘ", help=tr(lang, "tip_click_details"), use_container_width=True):
         st.markdown(body)
 
 
