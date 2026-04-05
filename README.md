@@ -1,71 +1,130 @@
-# JOB Assist — World Happiness Intelligence
+# World Happiness Report — Interactive Dashboard
 
-Monorepo con el **dashboard Streamlit** de exploración del *World Happiness Report* y, en paralelo, la **app R mínima** para redirigir desde un enlace antiguo en [shinyapps.io](https://shinyapps.io).
+[![CI](https://github.com/Guille1799/-World-Happiness-Report-Dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/Guille1799/-World-Happiness-Report-Dashboard/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Streamlit](https://img.shields.io/badge/Built%20with-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
-## Contenido del repositorio
+Exploratory analytics UI for **national life evaluations** (Cantril ladder, 0–10) and WHR-style drivers: **Plotly** maps, scatter plots, distributions, multi-country **trends**, CSV export, and **EN/ES** UI strings.  
+**Live app:** [world-happiness-report-dash.streamlit.app](https://world-happiness-report-dash.streamlit.app/)
 
-| Carpeta | Descripción |
-|--------|-------------|
-| [`world-happiness-streamlit/`](world-happiness-streamlit/) | App principal **Streamlit** (`app.py`), tests, Docker, `requirements.txt`. |
-| [`shiny-dashboard-redirect/`](shiny-dashboard-redirect/) | Shiny mínimo que solo **redirige** a la URL de Streamlit (misma URL pública en shinyapps.io). |
+This repository is a **monorepo**:
 
-## Requisitos
+| Path | Purpose |
+|------|---------|
+| [`world-happiness-streamlit/`](world-happiness-streamlit/) | Main **Streamlit** application (`app.py`), tests, Docker, pinned `requirements.txt`. |
+| [`shiny-dashboard-redirect/`](shiny-dashboard-redirect/) | Minimal **R/Shiny** app that **redirects** a legacy [shinyapps.io](https://www.shinyapps.io/) URL to the Streamlit deployment. |
 
-- **Python 3.11+** recomendado (coincide con el `Dockerfile`).
-- Cuenta **GitHub** para desplegar en [Streamlit Community Cloud](https://share.streamlit.io).
-- **No subas** el archivo `.env` (está en `.gitignore`). Usa [`.env.example`](.env.example) como plantilla.
+---
 
-## Puesta en marcha local (Streamlit)
+## Features (Streamlit app)
+
+- **Cross-section:** scatter (driver vs life evaluation), world choropleth, histogram, top/bottom bars, KPIs, automated insight bullets, optional **confidence intervals** when the WHR workbook provides whiskers.
+- **Trends:** up to eight countries, year-window zoom, presets (regional groups + data-driven rankings), summary table with coverage / missing-year stats, shareable **query parameters** (`year`, `t0`, `t1`, `c`).
+- **UX:** info popovers, safe linear fits when `numpy` SVD fails, graceful **offline** handling for optional World Bank population CSV.
+- **i18n:** English and Spanish for major labels and help text.
+
+---
+
+## Tech stack
+
+- Python **3.11+**, **Streamlit**, **Plotly**, **pandas**, **numpy**  
+- Optional: **country_converter**, **streamlit-plotly-events** (map click-to-add)  
+- Tests: **pytest** (`world-happiness-streamlit/tests/`)
+
+---
+
+## Quick start (local)
 
 ```bash
 cd world-happiness-streamlit
 python -m venv .venv
+# Windows:
 .venv\Scripts\activate
+# macOS/Linux:
+# source .venv/bin/activate
+
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Más detalle: [`world-happiness-streamlit/README.md`](world-happiness-streamlit/README.md).
+**Developer install (includes pytest):**
 
-## Subir a GitHub (primera vez)
-
-En la carpeta `JOB Assist` ya hay **commits** solo con el dashboard y el redirect (no se incluyen CVs, Job Hunter ni otros archivos de la carpeta).
-
-1. En [github.com/new](https://github.com/new) crea un **repositorio vacío** (sin README, sin `.gitignore` de la plantilla).
-2. Copia la URL que te muestra (HTTPS), algo como `https://github.com/tu-usuario/nombre-repo.git`.
-3. En PowerShell, desde `JOB Assist`:
-
-```powershell
-.\scripts\push-to-github.ps1 -RepoUrl "https://github.com/TU_USUARIO/TU_REPO.git"
+```bash
+pip install -r requirements-dev.txt
+python -m pytest tests/ -q
 ```
 
-Si GitHub pide credenciales: usuario = tu GitHub; **contraseña** = un [Personal Access Token](https://github.com/settings/tokens) (no la contraseña de la web).
+Copy [`.env.example`](.env.example) to `.env` only on your machine if you need paths or flags — **never commit `.env`**.
 
-**Alternativa manual** (mismo efecto):
+---
 
-```powershell
-git remote add origin https://github.com/TU_USUARIO/TU_REPO.git
-git push -u origin main
+## Deploy — Streamlit Community Cloud
+
+1. Push this repo to GitHub.
+2. Open [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
+3. **New app** → select the repo, branch **`main`**, main file **`world-happiness-streamlit/app.py`**.
+4. Add **Secrets** only if you use private data paths (same keys as `.env.example`).
+
+---
+
+## Legacy Shiny URL → Streamlit
+
+If you still serve an old link on **shinyapps.io**, deploy the tiny app in [`shiny-dashboard-redirect/`](shiny-dashboard-redirect/) so it redirects to your Streamlit URL.  
+Step-by-step: [`shiny-dashboard-redirect/DEPLOY-SHINY.md`](shiny-dashboard-redirect/DEPLOY-SHINY.md).
+
+---
+
+## Repository layout
+
+```
+world-happiness-streamlit/
+  app.py              # Entry point
+  i18n.py             # EN/ES strings
+  insights.py         # Automated bullets + safe_pearson_r
+  trend_helpers.py    # Presets, rankings, summary table
+  tests/              # pytest
+  data/demo_whr.csv   # Small demo dataset (committed)
+shiny-dashboard-redirect/
+  app.R               # Redirect target URL (Streamlit production)
+scripts/
+  push-to-github.ps1  # Optional: git remote + push (Windows)
 ```
 
-## Desplegar en Streamlit Cloud (después del `git push`)
+---
 
-1. En [share.streamlit.io](https://share.streamlit.io) → **New app** → conecta el repo.
-2. **Main file path:** `world-happiness-streamlit/app.py`
-3. **Branch:** `main`
-4. Si hace falta, en **Secrets** añade variables (mismo criterio que `.env.example`).
+## Contributing
 
-La URL pública será del estilo `https://<nombre>.streamlit.app`.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Redirección desde Shiny (cuando tengas la URL de Streamlit)
+---
 
-Instrucciones en [`shiny-dashboard-redirect/README.md`](shiny-dashboard-redirect/README.md).
+## Security
 
-## Seguridad
+Do not commit secrets. Report sensitive issues responsibly — see [SECURITY.md](SECURITY.md).
 
-- **Nunca** subas `.env` con tokens o claves. Si alguna vez quedó expuesta, **revócala** en BotFather / el servicio correspondiente y genera otra.
-- El repositorio solo incluye [`.env.example`](.env.example) como plantilla.
+---
 
-## Licencia y datos
+## License & data attribution
 
-Código bajo [LICENSE](LICENSE) (MIT). Los **datos del World Happiness Report** y **Gallup** siguen sus condiciones de uso; esta UI no está afiliada al WHR.
+- **Code:** [MIT License](LICENSE).
+- **Data:** [World Happiness Report](https://worldhappiness.report/) and **Gallup World Poll** data are subject to their terms. This project is **not** affiliated with the WHR, SDSN, or Gallup. World Bank–style population merge uses public registry data when online; a local CSV can be used offline.
+
+---
+
+## Roadmap (ideas to level up the project)
+
+High impact, roughly ordered:
+
+| Priority | Idea |
+|----------|------|
+| ★ | **CI** — GitHub Actions running pytest + syntax check (included in this repo). |
+| ★ | **Docs** — Screenshots/GIF in README; architecture one-pager. |
+| | **Coverage** — `pytest-cov` threshold on `trend_helpers` / `insights`. |
+| | **Lint/format** — `ruff` + optional `pre-commit` hooks. |
+| | **Accessibility** — keyboard focus, ARIA labels on custom HTML fragments. |
+| | **Performance** — cache tuning, lazy imports for cold start on Streamlit Cloud. |
+| | **Theming** — Streamlit theme file (dark/light) in `.streamlit/config.toml`. |
+| | **API** — thin FastAPI export of summary stats (optional separate service). |
+
+Contributions welcome — open an issue or PR.

@@ -1,22 +1,22 @@
-# Uso (desde esta carpeta):
+# Usage (from this directory):
 #   setwd(".../shiny-dashboard-redirect")
 #   source("deploy.R")
 #
-# Antes, una sola vez en este PC, ejecuta en R el bloque completo
-# rsconnect::setAccountInfo(...) que copias de shinyapps.io → Account → Tokens.
+# First time on this machine: run the full rsconnect::setAccountInfo(...) block
+# copied from shinyapps.io → Account → Tokens.
 
 if (!file.exists("app.R")) {
-  stop("Ejecuta este script con setwd() en la carpeta shiny-dashboard-redirect (donde está app.R).")
+  stop("Run this script with setwd() pointing at shiny-dashboard-redirect (where app.R lives).")
 }
 
 if (!requireNamespace("rsconnect", quietly = TRUE)) {
-  stop("Instala: install.packages('rsconnect')")
+  stop("Install: install.packages('rsconnect')")
 }
 
-message("Desplegando a shinyapps.io (appName = Dashboard)...")
+message("Deploying to shinyapps.io (appName = Dashboard)...")
 rsconnect::deployApp(
   appDir = ".",
   appName = "Dashboard",
   account = "guillermomartindeoliva"
 )
-message("Hecho.")
+message("Done.")

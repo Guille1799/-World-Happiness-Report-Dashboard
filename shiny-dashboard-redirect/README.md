@@ -1,15 +1,18 @@
-# Redirección shinyapps.io → Streamlit
+# Shiny → Streamlit redirect
 
-La URL de destino está en `app.R` (`STREAMLIT_URL` → Streamlit en producción).
+Minimal **R/Shiny** app that **HTTP-redirects** visitors from a legacy [shinyapps.io](https://www.shinyapps.io/) deployment to the current **Streamlit** app.
 
-**Guía detallada (PC nuevo, token, etc.):** [GUIA-DESPLEGUE.md](GUIA-DESPLEGUE.md)
+The target URL is set in `app.R` as `STREAMLIT_URL` (production Streamlit).
 
-Resumen: en shinyapps.io → **Account → Tokens**, ejecuta **una vez** el `rsconnect::setAccountInfo(...)` que te dan. Luego, en esta carpeta:
+**Full deploy guide:** [DEPLOY-SHINY.md](DEPLOY-SHINY.md)
+
+**Quick deploy** (after `rsconnect::setAccountInfo(...)` has been run once on this PC):
 
 ```r
-setwd("ruta/a/shiny-dashboard-redirect")
+setwd("path/to/shiny-dashboard-redirect")
 source("deploy.R")
 ```
 
-El nombre `Dashboard` debe coincidir con la app en shinyapps.io para conservar  
-`https://guillermomartindeoliva.shinyapps.io/Dashboard/`.
+Keep **`appName = "Dashboard"`** so the public URL remains:
+
+`https://guillermomartindeoliva.shinyapps.io/Dashboard/`

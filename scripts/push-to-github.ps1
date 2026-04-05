@@ -1,6 +1,6 @@
-# Ejecutar DESPUÉS de crear en github.com un repo vacío (sin README).
-# Ejemplo:
-#   .\scripts\push-to-github.ps1 -RepoUrl "https://github.com/tu-usuario/world-happiness-intelligence.git"
+# Run AFTER creating an empty GitHub repo (no README from the template).
+# Example:
+#   .\scripts\push-to-github.ps1 -RepoUrl "https://github.com/you/world-happiness-report-dashboard.git"
 
 param(
     [Parameter(Mandatory = $true)]
@@ -16,6 +16,6 @@ if (git remote get-url origin 2>$null) {
     git remote add origin $RepoUrl
 }
 
-Write-Host "Subiendo rama main..." -ForegroundColor Cyan
+Write-Host "Pushing branch main..." -ForegroundColor Cyan
 git push -u origin main
-Write-Host "Listo. Si pide credenciales, usa un Personal Access Token de GitHub como contraseña." -ForegroundColor Green
+Write-Host "Done. If prompted for a password, use a GitHub Personal Access Token." -ForegroundColor Green

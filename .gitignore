@@ -1,4 +1,4 @@
-# Entornos y caché Python
+# Python
 .venv/
 venv/
 __pycache__/
@@ -11,13 +11,13 @@ __pycache__/
 dist/
 build/
 
-# Secretos y local (nunca subir)
+# Secrets (never commit)
 .env
 .env.*
 !.env.example
 .streamlit/secrets.toml
 
-# Datos pesados / privados (el app puede descargar WHR o usar demo)
+# Large / private data (app can download WHR or use demo CSV)
 *.xlsx
 *.xls
 
@@ -34,5 +34,7 @@ Thumbs.db
 # Jupyter
 .ipynb_checkpoints/
 
-# Cursor (opcional)
 .cursor/
+
+# R / rsconnect deployment metadata (local)
+**/rsconnect/
