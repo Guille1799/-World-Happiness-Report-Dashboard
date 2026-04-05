@@ -27,13 +27,26 @@ streamlit run app.py
 
 Más detalle: [`world-happiness-streamlit/README.md`](world-happiness-streamlit/README.md).
 
+## Subir a GitHub (primera vez)
+
+En la carpeta `JOB Assist` ya hay un **commit inicial** solo con el dashboard y el redirect (no se incluyen CVs, Job Hunter ni otros archivos de la carpeta).
+
+1. Crea un repositorio **vacío** en GitHub (sin README, sin `.gitignore` generados por la web).
+2. En terminal (PowerShell), desde `JOB Assist`:
+
+```bash
+git remote add origin https://github.com/TU_USUARIO/TU_REPO.git
+git push -u origin main
+```
+
+(Si GitHub te pide autenticación, usa un **Personal Access Token** como contraseña o GitHub CLI.)
+
 ## Desplegar en Streamlit Cloud (después del `git push`)
 
-1. Crea un repositorio vacío en GitHub y sube **este repo** (`main`).
-2. En [share.streamlit.io](https://share.streamlit.io) → **New app** → conecta el repo.
-3. **Main file path:** `world-happiness-streamlit/app.py`
-4. **Branch:** `main` (o la que uses).
-5. Si hace falta, en **Secrets** añade variables (mismo criterio que `.env.example`).
+1. En [share.streamlit.io](https://share.streamlit.io) → **New app** → conecta el repo.
+2. **Main file path:** `world-happiness-streamlit/app.py`
+3. **Branch:** `main`
+4. Si hace falta, en **Secrets** añade variables (mismo criterio que `.env.example`).
 
 La URL pública será del estilo `https://<nombre>.streamlit.app`.
 
