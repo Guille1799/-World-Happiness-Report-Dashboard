@@ -85,7 +85,8 @@ Copy [`.env.example`](.env.example) to `.env` only on your machine if you need p
 2. Open [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
 3. **New app** → select the repo, branch **`main`**, main file **`world-happiness-streamlit/app.py`**.
 4. **Dependencies:** Streamlit Cloud installs the **root** [`requirements.txt`](requirements.txt), which includes [`world-happiness-streamlit/requirements.txt`](world-happiness-streamlit/requirements.txt) (Plotly, NumPy, etc.). Do not remove that `-r` line or the app will fail on `import plotly`.
-5. Add **Secrets** only if you use private data paths (same keys as `.env.example`).
+5. **Python version (important):** On deploy, open **Advanced settings** and choose **Python 3.12** or **3.11**. This project’s pins match those runtimes. If the platform picks **Python 3.14+**, installs can take ages or fail (missing wheels; source builds). **You cannot change Python after deploy** — you must [delete the app and redeploy](https://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app/upgrade-python) and pick **3.12** or **3.11** again under **Advanced settings**.
+6. Add **Secrets** only if you use private data paths (same keys as `.env.example`).
 
 **If the app stays on “Your app is in the oven” for more than ~5–10 minutes:** open **Manage app** (lower right) → **Logs** and check whether the build failed or is still installing. Try **Reboot app** (or **⋮ → Reboot**). If it still hangs, cancel the deploy and redeploy after a push; see [Streamlit status](https://www.streamlitstatus.com/) if outages are reported. The root [`requirements.txt`](requirements.txt) is kept minimal (only the dashboard `-r` file) so installs finish faster.
 
