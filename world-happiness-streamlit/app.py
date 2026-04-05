@@ -92,6 +92,10 @@ FIGURE21_X_LABELS = {
     "Generosity": "Explained by: generosity",
 }
 
+# Scatter vs map row: same height so the choropleth matches the scatter; plotly_events needs matching override_height.
+_CROSS_ROW_PLOT_HEIGHT = 520
+
+
 def _inject_app_styles() -> None:
     st.markdown(
         """
@@ -815,6 +819,7 @@ using the official Figure 2.1 workbook).
         )
     sc.update_layout(
         title=f"Life evaluation vs selected driver · {year} · r ≈ {r_str}",
+        height=_CROSS_ROW_PLOT_HEIGHT,
         paper_bgcolor="#ffffff",
         plot_bgcolor="#fafbfc",
         xaxis_title=x_label,
@@ -851,16 +856,17 @@ using the official Figure 2.1 workbook).
     )
     mp.update_layout(
         title=f"Geographic distribution · {year}",
+        height=_CROSS_ROW_PLOT_HEIGHT,
         geo=dict(
             showframe=False,
             projection_type="natural earth",
+            projection_scale=1.12,
             bgcolor="#eef2ff",
             landcolor="#e2e8f0",
             showocean=True,
             oceancolor="#f8fafc",
         ),
         margin=dict(l=0, r=0, t=50, b=0),
-        height=420,
     )
 
     iso_to_country = (
@@ -872,7 +878,13 @@ using the official Figure 2.1 workbook).
     with g2:
         if HAS_PLOTLY_EVENTS and plotly_events is not None:
             st.caption(tr(lang, "map_click_hint"))
-            ev = plotly_events(mp, click_event=True, key="map_click_events")
+            ev = plotly_events(
+                mp,
+                click_event=True,
+                key="map_click_events",
+                override_height=_CROSS_ROW_PLOT_HEIGHT,
+                override_width="100%",
+            )
             if ev:
                 for pt in ev:
                     loc = pt.get("location") or (pt.get("point") or {}).get("location")
