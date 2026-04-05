@@ -109,6 +109,20 @@ def _inject_app_styles() -> None:
     )
 
 
+def _hide_demo_banner() -> bool:
+    """Hide the yellow demo strip (local env or Streamlit Cloud Secrets)."""
+    raw = os.environ.get("WHR_HIDE_DEMO_BANNER", "").strip().lower()
+    if raw in ("1", "true", "yes", "on"):
+        return True
+    try:
+        s = st.secrets.get("WHR_HIDE_DEMO_BANNER", "")
+        if str(s).strip().lower() in ("1", "true", "yes", "on"):
+            return True
+    except Exception:
+        pass
+    return False
+
+
 def _render_demo_mode_banner() -> None:
     """Full-bleed banner at the very top of the page (above main column width)."""
     st.markdown(
@@ -539,7 +553,7 @@ def main():
         )
         st.stop()
 
-    if data_profile == "demo":
+    if data_profile == "demo" and not _hide_demo_banner():
         _render_demo_mode_banner()
 
     if st.session_state.pop("_show_pop_note", False):
