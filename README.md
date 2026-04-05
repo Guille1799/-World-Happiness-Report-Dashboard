@@ -29,17 +29,24 @@ Más detalle: [`world-happiness-streamlit/README.md`](world-happiness-streamlit/
 
 ## Subir a GitHub (primera vez)
 
-En la carpeta `JOB Assist` ya hay un **commit inicial** solo con el dashboard y el redirect (no se incluyen CVs, Job Hunter ni otros archivos de la carpeta).
+En la carpeta `JOB Assist` ya hay **commits** solo con el dashboard y el redirect (no se incluyen CVs, Job Hunter ni otros archivos de la carpeta).
 
-1. Crea un repositorio **vacío** en GitHub (sin README, sin `.gitignore` generados por la web).
-2. En terminal (PowerShell), desde `JOB Assist`:
+1. En [github.com/new](https://github.com/new) crea un **repositorio vacío** (sin README, sin `.gitignore` de la plantilla).
+2. Copia la URL que te muestra (HTTPS), algo como `https://github.com/tu-usuario/nombre-repo.git`.
+3. En PowerShell, desde `JOB Assist`:
 
-```bash
+```powershell
+.\scripts\push-to-github.ps1 -RepoUrl "https://github.com/TU_USUARIO/TU_REPO.git"
+```
+
+Si GitHub pide credenciales: usuario = tu GitHub; **contraseña** = un [Personal Access Token](https://github.com/settings/tokens) (no la contraseña de la web).
+
+**Alternativa manual** (mismo efecto):
+
+```powershell
 git remote add origin https://github.com/TU_USUARIO/TU_REPO.git
 git push -u origin main
 ```
-
-(Si GitHub te pide autenticación, usa un **Personal Access Token** como contraseña o GitHub CLI.)
 
 ## Desplegar en Streamlit Cloud (después del `git push`)
 
