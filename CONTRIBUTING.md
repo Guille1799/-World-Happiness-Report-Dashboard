@@ -6,11 +6,12 @@ Thanks for helping improve this project.
 
 1. **Fork** the repository and create a **feature branch** from `main`.
 2. Keep changes **focused** — one logical fix or feature per pull request.
-3. **Run tests** before opening a PR:
+3. **Lint and test** before opening a PR:
 
    ```bash
    cd world-happiness-streamlit
    pip install -r requirements-dev.txt
+   python -m ruff check .
    python -m pytest tests/ -q
    ```
 
