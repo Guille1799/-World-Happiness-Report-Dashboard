@@ -560,7 +560,7 @@ indicators. This dashboard is for **exploratory analysis** and communication —
 use a simple **linear fit on the GDP dimension** (raw log GDP in legacy mode; *explained-by* GDP contribution when
 using the official Figure 2.1 workbook).
 
-**Data source (this session).**  
+**Data source (this session).**
             """
         )
         st.markdown(f"_{wh_source}_")

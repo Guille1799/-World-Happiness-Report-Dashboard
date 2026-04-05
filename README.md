@@ -8,6 +8,12 @@
 Exploratory analytics UI for **national life evaluations** (Cantril ladder, 0–10) and WHR-style drivers: **Plotly** maps, scatter plots, distributions, multi-country **trends**, CSV export, and **EN/ES** UI strings.  
 **Live app:** [world-happiness-report-dash.streamlit.app](https://world-happiness-report-dash.streamlit.app/)
 
+### Screenshots
+
+The UI includes a cross-section **scatter** and **map**, **histograms**, **rankings**, and multi-country **trends** with CSV export.  
+Open the **[live app](https://world-happiness-report-dash.streamlit.app/)** for the full experience.  
+To add a static preview to this README later, drop a PNG under [`docs/images/`](docs/images/) and link it here.
+
 This repository is a **monorepo**:
 
 | Path | Purpose |
@@ -118,10 +124,11 @@ High impact, roughly ordered:
 
 | Priority | Idea |
 |----------|------|
-| ★ | **CI** — GitHub Actions running pytest + syntax check (included in this repo). |
-| ★ | **Docs** — Screenshots/GIF in README; architecture one-pager. |
+| ★ | **CI** — GitHub Actions: **Ruff**, pytest, `py_compile` (see `.github/workflows/ci.yml`). |
+| ★ | **Lint** — `ruff` + `pyproject.toml` in `world-happiness-streamlit/`. |
+| | **Docs** — Drop a PNG into `docs/images/` and embed in README. |
 | | **Coverage** — `pytest-cov` threshold on `trend_helpers` / `insights`. |
-| | **Lint/format** — `ruff` + optional `pre-commit` hooks. |
+| | **pre-commit** — optional hooks calling `ruff check --fix`. |
 | | **Accessibility** — keyboard focus, ARIA labels on custom HTML fragments. |
 | | **Performance** — cache tuning, lazy imports for cold start on Streamlit Cloud. |
 | | **Theming** — Streamlit theme file (dark/light) in `.streamlit/config.toml`. |
