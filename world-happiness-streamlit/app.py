@@ -186,7 +186,8 @@ def _inline_tip(lang: str, key: str) -> None:
     """Single expander (ℹ️): avoids st.popover+help (ugly stacked icons; help hover unreliable in sidebar)."""
     body = tr(lang, key)
     intro = tr(lang, "tip_click_short")
-    with st.expander("ℹ️", expanded=False, key=f"whr_tip_{key}_{lang}"):
+    # No `key=` — not supported on st.expander in Streamlit 1.40.x (Cloud pins this version).
+    with st.expander("ℹ️", expanded=False):
         st.caption(intro)
         st.markdown(body)
 
