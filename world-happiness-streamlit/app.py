@@ -103,21 +103,47 @@ def _inject_app_styles() -> None:
     .whr-main-title { font-weight: 700; letter-spacing: -0.03em; color: #0f172a; margin-bottom: 0.15rem; }
     .whr-sub { color: #64748b; font-size: 0.95rem; margin-top: 0; }
     div[data-testid="stSidebarHeader"] { padding-bottom: 0.5rem; }
+    /* Compact ℹ️ expanders (popover looked like a double control with chevron + icon) */
+    section[data-testid="stSidebar"] details[data-testid="stExpander"] summary {
+        font-size: 1.05rem;
+        padding: 0.15rem 0;
+    }
+    section[data-testid="stSidebar"] details[data-testid="stExpander"] {
+        border: 1px solid #e2e8f0;
+        border-radius: 0.35rem;
+        background: #f8fafc;
+    }
 </style>
         """,
         unsafe_allow_html=True,
     )
 
 
-def _hide_demo_banner() -> bool:
-    """Hide the yellow demo strip (local env or Streamlit Cloud Secrets)."""
-    raw = os.environ.get("WHR_HIDE_DEMO_BANNER", "").strip().lower()
-    if raw in ("1", "true", "yes", "on"):
+def _truthy_env_or_secret(val: object) -> bool:
+    if val is True:
         return True
-    try:
-        s = st.secrets.get("WHR_HIDE_DEMO_BANNER", "")
-        if str(s).strip().lower() in ("1", "true", "yes", "on"):
+    if val is False or val is None:
+        return False
+    s = str(val).strip().lower()
+    return s in ("1", "true", "yes", "on")
+
+
+def _hide_demo_banner() -> bool:
+    """Hide the yellow demo strip (env vars or Streamlit Cloud Secrets)."""
+    keys = ("WHR_HIDE_DEMO_BANNER", "HIDE_DEMO_BANNER")
+    for k in keys:
+        v = os.environ.get(k)
+        if v is not None and _truthy_env_or_secret(v):
             return True
+    try:
+        sec = st.secrets
+        for k in keys:
+            try:
+                v = sec[k]
+            except Exception:
+                continue
+            if _truthy_env_or_secret(v):
+                return True
     except Exception:
         pass
     return False
@@ -157,9 +183,11 @@ def _render_demo_mode_banner() -> None:
 
 
 def _inline_tip(lang: str, key: str) -> None:
-    """ⓘ opens a popover with full markdown; hover shows Streamlit help on the control."""
+    """Single expander (ℹ️): avoids st.popover+help (ugly stacked icons; help hover unreliable in sidebar)."""
     body = tr(lang, key)
-    with st.popover("ⓘ", help=tr(lang, "tip_click_details"), use_container_width=True):
+    intro = tr(lang, "tip_click_short")
+    with st.expander("ℹ️", expanded=False, key=f"whr_tip_{key}_{lang}"):
+        st.caption(intro)
         st.markdown(body)
 
 
@@ -622,12 +650,13 @@ using the official Figure 2.1 workbook).
             key="lang",
         )
         lang = st.session_state.lang
-        ac_l, ac_r = st.columns([0.88, 0.12])
+        ac_l, ac_r = st.columns([0.82, 0.18])
         with ac_l:
             st.markdown(tr(lang, "analysis_controls"))
         with ac_r:
             _inline_tip(lang, "tip_sidebar_controls")
         st.caption(tr(lang, "sidebar_caption"))
+        st.caption(tr(lang, "sidebar_data_span").format(year_min=year_min, year_max=year_max))
         year = st.slider(
             tr(lang, "ref_year"),
             year_min,

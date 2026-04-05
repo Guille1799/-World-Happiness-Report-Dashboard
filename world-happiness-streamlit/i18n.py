@@ -8,6 +8,8 @@ UI: dict[str, dict[str, str]] = {
         "analysis_controls": "### Analysis controls",
         "sidebar_caption": "Reference **year** and **scatter axis** apply to the cross-sectional charts. "
         "Trend comparison is configured in the main panel.",
+        "sidebar_data_span": "Years available in this dataset: **{year_min}–{year_max}**. "
+        "The bundled demo CSV is a small sample (often through 2023); the official WHR Figure 2.1 Excel usually includes more recent years.",
         "ref_year": "Reference year",
         "rank_n": "Top / bottom (N)",
         "scatter_axis": "Scatter: horizontal axis",
@@ -42,7 +44,8 @@ UI: dict[str, dict[str, str]] = {
         "tip_dyn_presets": "Heuristics over the full time span in this extract: gains/losses use first-to-last available year per country; volatility uses standard deviation; slopes use OLS on year. See the expander above for exact definitions.",
         "tip_trend_summary": "Table: stats per country inside the selected year window (observed years, coverage vs calendar span, first/last life evaluation, mean, σ, and Δ last−first).",
         "help_trend_search": "Filter countries by substring; pick one from the list and use Add to comparison.",
-        "tip_click_details": "Click for the full explanation. You can also hover the ⓘ button for a short hint.",
+        "tip_click_short": "Open for the full explanation (sidebar tooltips are limited in Streamlit).",
+        "tip_click_details": "Click the ℹ️ control to expand help.",
         "caption_cross_section": "Single-year view for **{year}** · {n_ct} countries · full time span in data: **{year_min}–{year_max}**",
         "h_at_glance": "### At a glance",
         "info_at_glance": "**{year}** · **{n_ct}** countries · Pearson **r** between **{x_label}** and life evaluation: **≈ {r_str}** {assoc}",
@@ -105,6 +108,8 @@ UI: dict[str, dict[str, str]] = {
         "analysis_controls": "### Controles de análisis",
         "sidebar_caption": "El **año** y el **eje del scatter** aplican a la vista transversal. "
         "La comparación de tendencias se configura en el panel principal.",
+        "sidebar_data_span": "Años disponibles en este dataset: **{year_min}–{year_max}**. "
+        "El CSV de demo incluido es un extracto pequeño (a menudo hasta 2023); el Excel oficial WHR Fig. 2.1 suele traer años más recientes.",
         "ref_year": "Año de referencia",
         "rank_n": "Top / bottom (N)",
         "scatter_axis": "Scatter: eje horizontal",
@@ -139,7 +144,8 @@ UI: dict[str, dict[str, str]] = {
         "tip_dyn_presets": "Heurísticas sobre todo el rango temporal del extracto: subidas/bajadas usan primer vs último año disponible por país; volatilidad = desviación típica; pendientes = MCO sobre el año. Ver el desplegable de definiciones arriba.",
         "tip_trend_summary": "Tabla: estadísticas por país en la ventana de años elegida (años observados, cobertura frente al calendario, primera/última evaluación, media, σ y Δ último−primero).",
         "help_trend_search": "Filtra países por texto; elige uno en la lista y usa Añadir a la comparación.",
-        "tip_click_details": "Pulsa para ver la explicación completa. También puedes pasar el ratón por ⓘ para un resumen.",
+        "tip_click_short": "Abre para ver la explicación completa (los tooltips nativos en la barra lateral son limitados en Streamlit).",
+        "tip_click_details": "Pulsa el control ℹ️ para desplegar la ayuda.",
         "caption_cross_section": "Vista de un solo año (**{year}**) · {n_ct} países · rango temporal del extracto: **{year_min}–{year_max}**",
         "h_at_glance": "### De un vistazo",
         "info_at_glance": "**{year}** · **{n_ct}** países · correlación de Pearson **r** entre **{x_label}** y evaluación de vida: **≈ {r_str}** {assoc}",
