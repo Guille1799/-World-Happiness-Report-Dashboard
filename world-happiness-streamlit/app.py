@@ -103,7 +103,7 @@ def _inject_app_styles() -> None:
     .whr-main-title { font-weight: 700; letter-spacing: -0.03em; color: #0f172a; margin-bottom: 0.15rem; }
     .whr-sub { color: #64748b; font-size: 0.95rem; margin-top: 0; }
     div[data-testid="stSidebarHeader"] { padding-bottom: 0.5rem; }
-    /* Compact ℹ️ expanders (popover looked like a double control with chevron + icon) */
+    /* Sidebar expanders (e.g. Quick reference): keep them readable */
     section[data-testid="stSidebar"] details[data-testid="stExpander"] summary {
         font-size: 1.05rem;
         padding: 0.15rem 0;
@@ -183,11 +183,10 @@ def _render_demo_mode_banner() -> None:
 
 
 def _inline_tip(lang: str, key: str) -> None:
-    """Single expander (ℹ️): avoids st.popover+help (ugly stacked icons; help hover unreliable in sidebar)."""
+    """Popover overlay (ℹ️). st.expander grows in-page and pushes all widgets downward — bad UX."""
     body = tr(lang, key)
     intro = tr(lang, "tip_click_short")
-    # No `key=` — not supported on st.expander in Streamlit 1.40.x (Cloud pins this version).
-    with st.expander("ℹ️", expanded=False):
+    with st.popover("ℹ️", use_container_width=False):
         st.caption(intro)
         st.markdown(body)
 
