@@ -7,7 +7,7 @@
 library(shiny)
 
 # === Edita solo esto ===
-STREAMLIT_URL <- "https://TU-APP.streamlit.app"
+STREAMLIT_URL <- "https://world-happiness-report-dash.streamlit.app/"
 # =======================
 
 ui <- fluidPage(
