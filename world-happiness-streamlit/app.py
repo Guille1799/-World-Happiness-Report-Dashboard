@@ -185,9 +185,7 @@ def _render_demo_mode_banner() -> None:
 def _inline_tip(lang: str, key: str) -> None:
     """Popover overlay (ℹ️). st.expander grows in-page and pushes all widgets downward — bad UX."""
     body = tr(lang, key)
-    intro = tr(lang, "tip_click_short")
     with st.popover("ℹ️", use_container_width=False):
-        st.caption(intro)
         st.markdown(body)
 
 
