@@ -87,6 +87,8 @@ Copy [`.env.example`](.env.example) to `.env` only on your machine if you need p
 4. **Dependencies:** Streamlit Cloud installs the **root** [`requirements.txt`](requirements.txt), which includes [`world-happiness-streamlit/requirements.txt`](world-happiness-streamlit/requirements.txt) (Plotly, NumPy, etc.). Do not remove that `-r` line or the app will fail on `import plotly`.
 5. Add **Secrets** only if you use private data paths (same keys as `.env.example`).
 
+**If the app stays on “Your app is in the oven” for more than ~5–10 minutes:** open **Manage app** (lower right) → **Logs** and check whether the build failed or is still installing. Try **Reboot app** (or **⋮ → Reboot**). If it still hangs, cancel the deploy and redeploy after a push; see [Streamlit status](https://www.streamlitstatus.com/) if outages are reported. The root [`requirements.txt`](requirements.txt) is kept minimal (only the dashboard `-r` file) so installs finish faster.
+
 ---
 
 ## Legacy Shiny URL → Streamlit

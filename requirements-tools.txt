@@ -1,0 +1,9 @@
+# Optional extras for other scripts in this monorepo (local use — not required for Streamlit Cloud).
+# Install when needed: pip install -r requirements-tools.txt
+-r requirements.txt
+
+requests
+PyYAML
+python-dateutil
+beautifulsoup4
+python-docx
