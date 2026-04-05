@@ -1,0 +1,7 @@
+# Data (add your xlsx locally or use Streamlit secrets — see README)
+data/*.xlsx
+data/*.XLSX
+__pycache__/
+.venv/
+.env
+.streamlit/secrets.toml
