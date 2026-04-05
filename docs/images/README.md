@@ -1,7 +1,7 @@
-# Screenshots (optional)
+# Screenshots
 
-Add one or more PNG previews for the repository README, for example:
+| File | Description |
+|------|----------------|
+| `dashboard-overview.png` | Cross-section grid (scatter, map, distribution, ranking) — used in the root README. |
 
-- `dashboard-overview.png` — main cross-section view (scatter + map)
-
-Keep files **under ~1 MB** each so the repo stays light. Reference them from the root `README.md` when ready.
+Replace or add PNGs here (keep files small, &lt; ~1 MB) and reference them from `README.md`.

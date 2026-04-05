@@ -10,9 +10,14 @@ Exploratory analytics UI for **national life evaluations** (Cantril ladder, 0–
 
 ### Screenshots
 
-The UI includes a cross-section **scatter** and **map**, **histograms**, **rankings**, and multi-country **trends** with CSV export.  
-Open the **[live app](https://world-happiness-report-dash.streamlit.app/)** for the full experience.  
-To add a static preview to this README later, drop a PNG under [`docs/images/`](docs/images/) and link it here.
+<p align="center">
+  <a href="https://world-happiness-report-dash.streamlit.app/">
+    <img src="docs/images/dashboard-overview.png" alt="World Happiness Intelligence — cross-section: scatter, map, distribution, ranking (2023)" width="900">
+  </a>
+</p>
+
+*Cross-section view: scatter & drivers, geographic distribution, histogram, top/bottom ranking.  
+**[Open the live app](https://world-happiness-report-dash.streamlit.app/)** for trends, exports, and EN/ES UI.*
 
 This repository is a **monorepo**:
 
