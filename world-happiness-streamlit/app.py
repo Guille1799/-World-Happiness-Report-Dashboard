@@ -92,6 +92,11 @@ FIGURE21_X_LABELS = {
     "Generosity": "Explained by: generosity",
 }
 
+# Cross-section: scatter (left) vs map (right). Slightly wider map column so the choropleth stays readable.
+_SCATTER_MAP_COL_RATIO = [0.42, 0.58]
+_CROSS_PLOT_HEIGHT = 520
+
+
 def _inject_app_styles() -> None:
     st.markdown(
         """
@@ -100,6 +105,39 @@ def _inject_app_styles() -> None:
     .whr-sub { color: #64748b; font-size: 0.95rem; margin-top: 0; }
     div[data-testid="stSidebarHeader"] { padding-bottom: 0.5rem; }
 </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def _render_demo_mode_banner() -> None:
+    """Full-bleed banner at the very top of the page (above main column width)."""
+    st.markdown(
+        """
+<style>
+    .whr-demo-fw {
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        box-sizing: border-box;
+        background: #fff3cd;
+        border-bottom: 1px solid #e6ca72;
+        padding: 0.55rem 1rem 0.6rem;
+        font-size: 0.9rem;
+        text-align: center;
+        color: #1f2937;
+        margin-bottom: 0.85rem;
+    }
+    .whr-demo-fw code { font-size: 0.85em; }
+</style>
+<div class="whr-demo-fw">
+<strong>Demo mode</strong> (<code>data/demo_whr.csv</code>). For production data, allow the app to download
+<code>WHR26_Data_Figure_2.1.xlsx</code>, place your own Excel under <code>data/</code>, or unset
+<code>WHR_NO_AUTO_DOWNLOAD</code> if you disabled automatic download.
+</div>
         """,
         unsafe_allow_html=True,
     )
@@ -488,11 +526,6 @@ def main():
         wh_source = WH_SOURCE_FIGURE21
         data_profile = "figure21"
     elif demo_path is not None:
-        st.warning(
-            "**Demo mode** (`data/demo_whr.csv`). For production data, allow the app to download "
-            "`WHR26_Data_Figure_2.1.xlsx`, place your own Excel under `data/`, or unset `WHR_NO_AUTO_DOWNLOAD` "
-            "if you disabled automatic download."
-        )
         df = load_demo_data(str(demo_path))
         x_labels = X_LABELS
         wh_source = WH_SOURCE_DEMO
@@ -506,6 +539,9 @@ def main():
             "(4) run `python scripts/generate_demo_whr.py` to build `data/demo_whr.csv`."
         )
         st.stop()
+
+    if data_profile == "demo":
+        _render_demo_mode_banner()
 
     if st.session_state.pop("_show_pop_note", False):
         st.warning(
@@ -714,7 +750,7 @@ using the official Figure 2.1 workbook).
 
     st.divider()
 
-    sm_l, sm_r = st.columns(2)
+    sm_l, sm_r = st.columns(_SCATTER_MAP_COL_RATIO)
     with sm_l:
         sm_h, sm_t = st.columns([0.88, 0.12])
         with sm_h:
@@ -784,6 +820,7 @@ using the official Figure 2.1 workbook).
         )
     sc.update_layout(
         title=f"Life evaluation vs selected driver · {year} · r ≈ {r_str}",
+        height=_CROSS_PLOT_HEIGHT,
         paper_bgcolor="#ffffff",
         plot_bgcolor="#fafbfc",
         xaxis_title=x_label,
@@ -814,12 +851,13 @@ using the official Figure 2.1 workbook).
             zmin=happy_min,
             zmax=happy_max,
             marker_line_width=0.3,
-            colorbar=dict(title="Life evaluation", thickness=12, len=0.5),
+            colorbar=dict(title="Life evaluation", thickness=14, len=0.38),
             hovertemplate="<b>%{text}</b><br>Life evaluation: %{z:.2f}<extra></extra>",
         )
     )
     mp.update_layout(
         title=f"Geographic distribution · {year}",
+        height=_CROSS_PLOT_HEIGHT,
         geo=dict(
             showframe=False,
             projection_type="natural earth",
@@ -827,15 +865,15 @@ using the official Figure 2.1 workbook).
             landcolor="#e2e8f0",
             showocean=True,
             oceancolor="#f8fafc",
+            domain=dict(x=[0.0, 0.92], y=[0.0, 1.0]),
         ),
-        margin=dict(l=0, r=0, t=50, b=0),
-        height=420,
+        margin=dict(l=0, r=10, t=50, b=0),
     )
 
     iso_to_country = (
         df_y.drop_duplicates("iso_a3").set_index("iso_a3")["Country"].to_dict() if len(df_y) else {}
     )
-    g1, g2 = st.columns(2)
+    g1, g2 = st.columns(_SCATTER_MAP_COL_RATIO)
     with g1:
         st.plotly_chart(sc, use_container_width=True, config=plotly_config())
     with g2:
