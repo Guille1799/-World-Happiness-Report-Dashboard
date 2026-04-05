@@ -8,7 +8,17 @@
 Exploratory analytics UI for **national life evaluations** (Cantril ladder, 0–10) and WHR-style drivers: **Plotly** maps, scatter plots, distributions, multi-country **trends**, CSV export, and **EN/ES** UI strings.  
 **Live app:** [world-happiness-report-dash.streamlit.app](https://world-happiness-report-dash.streamlit.app/)
 
+### Case study (short)
+
+Researchers, students, and journalists often need to **compare countries over time** and **see drivers of life evaluation** without spinning up a notebook for every question. This dashboard turns WHR-style tabular data into **linked views** (scatter, map, trends, exports) with **EN/ES** labels so a single deployment can support presentations and self-serve exploration. It is intentionally **dependency-light** for Streamlit Cloud while still allowing optional map click-to-add when `streamlit-plotly-events` is installed.
+
 ### Screenshots
+
+<p align="center">
+  <a href="https://world-happiness-report-dash.streamlit.app/">
+    <img src="docs/images/demo.gif" alt="Animated preview: cross-section dashboard (zoom loop)" width="720">
+  </a>
+</p>
 
 <p align="center">
   <a href="https://world-happiness-report-dash.streamlit.app/">
@@ -16,8 +26,7 @@ Exploratory analytics UI for **national life evaluations** (Cantril ladder, 0–
   </a>
 </p>
 
-*Cross-section view: scatter & drivers, geographic distribution, histogram, top/bottom ranking.  
-**[Open the live app](https://world-happiness-report-dash.streamlit.app/)** for trends, exports, and EN/ES UI.*
+*Cross-section view: scatter & drivers, geographic distribution, histogram, top/bottom ranking. The GIF above is a subtle zoom loop from the static screenshot; **[open the live app](https://world-happiness-report-dash.streamlit.app/)** for trends, exports, and EN/ES UI.*
 
 This repository is a **monorepo**:
 
@@ -75,7 +84,8 @@ Copy [`.env.example`](.env.example) to `.env` only on your machine if you need p
 1. Push this repo to GitHub.
 2. Open [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
 3. **New app** → select the repo, branch **`main`**, main file **`world-happiness-streamlit/app.py`**.
-4. Add **Secrets** only if you use private data paths (same keys as `.env.example`).
+4. **Dependencies:** Streamlit Cloud installs the **root** [`requirements.txt`](requirements.txt), which includes [`world-happiness-streamlit/requirements.txt`](world-happiness-streamlit/requirements.txt) (Plotly, NumPy, etc.). Do not remove that `-r` line or the app will fail on `import plotly`.
+5. Add **Secrets** only if you use private data paths (same keys as `.env.example`).
 
 ---
 
@@ -99,6 +109,7 @@ world-happiness-streamlit/
 shiny-dashboard-redirect/
   app.R               # Redirect target URL (Streamlit production)
 scripts/
+  make_demo_gif.py    # Regenerate docs/images/demo.gif (needs Pillow)
   push-to-github.ps1  # Optional: git remote + push (Windows)
 ```
 
@@ -129,14 +140,14 @@ High impact, roughly ordered:
 
 | Priority | Idea |
 |----------|------|
-| ★ | **CI** — GitHub Actions: **Ruff**, pytest, `py_compile` (see `.github/workflows/ci.yml`). |
-| ★ | **Lint** — `ruff` + `pyproject.toml` in `world-happiness-streamlit/`. |
-| | **Docs** — Drop a PNG into `docs/images/` and embed in README. |
-| | **Coverage** — `pytest-cov` threshold on `trend_helpers` / `insights`. |
-| | **pre-commit** — optional hooks calling `ruff check --fix`. |
+| ✓ | **CI** — GitHub Actions: **Ruff**, pytest + **coverage** (≥ 95% on `trend_helpers` / `insights`), `py_compile`. |
+| ✓ | **Lint** — `ruff` + `pyproject.toml` in `world-happiness-streamlit/`. |
+| ✓ | **Docs** — PNG in `docs/images/`, optional GIF note in README. |
+| ✓ | **pre-commit** — `.pre-commit-config.yaml` (Ruff + pytest when app code changes). |
+| ✓ | **Theming** — `.streamlit/config.toml` (light default; dark via app **Settings → Appearance**). |
+| ✓ | **Issues** — templates under `.github/ISSUE_TEMPLATE/`. |
 | | **Accessibility** — keyboard focus, ARIA labels on custom HTML fragments. |
 | | **Performance** — cache tuning, lazy imports for cold start on Streamlit Cloud. |
-| | **Theming** — Streamlit theme file (dark/light) in `.streamlit/config.toml`. |
 | | **API** — thin FastAPI export of summary stats (optional separate service). |
 
 Contributions welcome — open an issue or PR.

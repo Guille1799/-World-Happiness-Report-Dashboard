@@ -1,3 +1,12 @@
+# Default theme: light. Users can switch to Dark or System (follow OS) in the app menu
+# (⋮ → Settings → Appearance) without editing this file.
+#
+# For a dark-first deployment, set base = "dark" and consider:
+#   primaryColor = "#818cf8"
+#   backgroundColor = "#0f172a"
+#   secondaryBackgroundColor = "#1e293b"
+#   textColor = "#f1f5f9"
+
 [theme]
 base = "light"
 primaryColor = "#4f46e5"

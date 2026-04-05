@@ -1,0 +1,10 @@
+# Streamlit Community Cloud reads this file from the repo root — must include the dashboard deps
+# (otherwise `import plotly` fails when Main file is world-happiness-streamlit/app.py).
+-r world-happiness-streamlit/requirements.txt
+
+# Other tooling in this monorepo (local / non-Streamlit)
+requests
+PyYAML
+python-dateutil
+beautifulsoup4
+python-docx

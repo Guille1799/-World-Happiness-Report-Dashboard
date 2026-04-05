@@ -30,8 +30,13 @@ jobs:
       - name: Ruff lint
         run: python -m ruff check .
 
-      - name: Run tests
-        run: python -m pytest tests/ -q
+      - name: Run tests with coverage
+        run: >
+          python -m pytest tests/ -q
+          --cov=trend_helpers
+          --cov=insights
+          --cov-report=term-missing
+          --cov-fail-under=95
 
       - name: Syntax check (main modules)
         run: |
