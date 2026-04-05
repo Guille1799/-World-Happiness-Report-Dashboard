@@ -182,11 +182,23 @@ def _render_demo_mode_banner() -> None:
     )
 
 
+@st.dialog("ℹ️", width="large")
+def _whr_help_dialog() -> None:
+    """Centered modal — avoids st.popover anchoring to the far right on wide layouts."""
+    lang = st.session_state.get("_whr_dlg_lang", "en")
+    key = st.session_state.get("_whr_dlg_key", "")
+    st.markdown(tr(lang, key))
+    if st.button(tr(lang, "tip_dialog_close"), key="whr_help_dialog_close"):
+        st.rerun()
+
+
 def _inline_tip(lang: str, key: str) -> None:
-    """Popover overlay (ℹ️). st.expander grows in-page and pushes all widgets downward — bad UX."""
-    body = tr(lang, key)
-    with st.popover("ℹ️", use_container_width=False):
-        st.markdown(body)
+    """Open help in a centered dialog (not st.popover — panel was detached on the right margin)."""
+    btn_key = f"whr_help_btn_{key}_{lang}"
+    if st.button("ℹ️", key=btn_key):
+        st.session_state["_whr_dlg_lang"] = lang
+        st.session_state["_whr_dlg_key"] = key
+        _whr_help_dialog()
 
 
 def _title_with_tip(lang: str, title_md: str, tip_key: str) -> None:
