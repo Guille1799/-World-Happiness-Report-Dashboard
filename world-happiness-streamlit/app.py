@@ -189,13 +189,34 @@ def _inline_tip(lang: str, key: str) -> None:
         st.markdown(body)
 
 
+# Title + ℹ️ share a narrow left cluster so the popover stays near the heading, not the viewport edge.
+_TIP_HEAD_CLUSTER_MAIN = 0.52
+_TIP_HEAD_CLUSTER_SUB = 0.88
+
+
+def _markdown_heading_with_tip(
+    lang: str,
+    title_md: str,
+    tip_key: str,
+    *,
+    full_width_row: bool = True,
+) -> None:
+    """Section title with ℹ️ grouped to the left of the row (or within a column)."""
+    if full_width_row:
+        cluster, _spacer = st.columns([_TIP_HEAD_CLUSTER_MAIN, 1.0 - _TIP_HEAD_CLUSTER_MAIN])
+    else:
+        cluster, _spacer = st.columns([_TIP_HEAD_CLUSTER_SUB, 1.0 - _TIP_HEAD_CLUSTER_SUB])
+    with cluster:
+        left, right = st.columns([0.88, 0.12])
+        with left:
+            st.markdown(title_md)
+        with right:
+            _inline_tip(lang, tip_key)
+
+
 def _title_with_tip(lang: str, title_md: str, tip_key: str) -> None:
-    """Section title (markdown) with info icon column."""
-    left, right = st.columns([0.94, 0.06])
-    with left:
-        st.markdown(title_md)
-    with right:
-        _inline_tip(lang, tip_key)
+    """Section title (markdown) with info icon next to it."""
+    _markdown_heading_with_tip(lang, title_md, tip_key, full_width_row=True)
 
 
 def _sync_trend_selection(countries: list[str]) -> None:
@@ -645,11 +666,7 @@ using the official Figure 2.1 workbook).
             key="lang",
         )
         lang = st.session_state.lang
-        ac_l, ac_r = st.columns([0.82, 0.18])
-        with ac_l:
-            st.markdown(tr(lang, "analysis_controls"))
-        with ac_r:
-            _inline_tip(lang, "tip_sidebar_controls")
+        _markdown_heading_with_tip(lang, tr(lang, "analysis_controls"), "tip_sidebar_controls")
         st.caption(tr(lang, "sidebar_caption"))
         st.caption(tr(lang, "sidebar_data_span").format(year_min=year_min, year_max=year_max))
         year = st.slider(
@@ -706,12 +723,8 @@ using the official Figure 2.1 workbook).
 
     st.divider()
 
-    # --- Narrative row ("At a glance": title + info must stay in one row; st.info is full-width below)
-    ag_l, ag_r = st.columns([0.92, 0.08])
-    with ag_l:
-        st.markdown(tr(lang, "h_at_glance"))
-    with ag_r:
-        _inline_tip(lang, "tip_glance")
+    # --- Narrative row ("At a glance": title + info clustered left; st.info is full-width below)
+    _markdown_heading_with_tip(lang, tr(lang, "h_at_glance"), "tip_glance")
     st.info(
         tr(lang, "info_at_glance").format(
             year=year,
@@ -747,11 +760,7 @@ using the official Figure 2.1 workbook).
     df_y = df_y.assign(_resid=resid)
     star = df_y.nlargest(1, "_resid").iloc[0]
 
-    in_l, in_r = st.columns([0.88, 0.12])
-    with in_l:
-        st.markdown(tr(lang, "h_interp_notes"))
-    with in_r:
-        _inline_tip(lang, "tip_interp_notes")
+    _markdown_heading_with_tip(lang, tr(lang, "h_interp_notes"), "tip_interp_notes")
     rng = df_y["Happiness"].max() - df_y["Happiness"].min()
     st.markdown(
         tr(lang, "interp_notes_md").format(
@@ -767,17 +776,11 @@ using the official Figure 2.1 workbook).
 
     sm_l, sm_r = st.columns(2)
     with sm_l:
-        sm_h, sm_t = st.columns([0.88, 0.12])
-        with sm_h:
-            st.markdown(tr(lang, "h_scatter_drivers"))
-        with sm_t:
-            _inline_tip(lang, "tip_scatter_chart")
+        _markdown_heading_with_tip(
+            lang, tr(lang, "h_scatter_drivers"), "tip_scatter_chart", full_width_row=False
+        )
     with sm_r:
-        mp_h, mp_t = st.columns([0.88, 0.12])
-        with mp_h:
-            st.markdown(tr(lang, "h_map"))
-        with mp_t:
-            _inline_tip(lang, "tip_map")
+        _markdown_heading_with_tip(lang, tr(lang, "h_map"), "tip_map", full_width_row=False)
 
     # Scatter
     fit_xy = _safe_polyfit_deg1(df_y[x_metric].values, df_y["Happiness"].values)
@@ -965,17 +968,13 @@ using the official Figure 2.1 workbook).
 
     dh_l, dh_r = st.columns(2)
     with dh_l:
-        dh_h, dh_t = st.columns([0.88, 0.12])
-        with dh_h:
-            st.markdown(tr(lang, "h_distribution"))
-        with dh_t:
-            _inline_tip(lang, "tip_histogram")
+        _markdown_heading_with_tip(
+            lang, tr(lang, "h_distribution"), "tip_histogram", full_width_row=False
+        )
     with dh_r:
-        rk_h, rk_t = st.columns([0.88, 0.12])
-        with rk_h:
-            st.markdown(tr(lang, "h_ranking"))
-        with rk_t:
-            _inline_tip(lang, "tip_rank_bars")
+        _markdown_heading_with_tip(
+            lang, tr(lang, "h_ranking"), "tip_rank_bars", full_width_row=False
+        )
 
     g3, g4 = st.columns(2)
     with g3:
@@ -983,11 +982,7 @@ using the official Figure 2.1 workbook).
     with g4:
         st.plotly_chart(br, use_container_width=True, config=plotly_config())
 
-    ex_l, ex_r = st.columns([0.88, 0.12])
-    with ex_l:
-        st.markdown(tr(lang, "h_export_preview"))
-    with ex_r:
-        _inline_tip(lang, "tip_export")
+    _markdown_heading_with_tip(lang, tr(lang, "h_export_preview"), "tip_export")
 
     exp1, exp2 = st.columns(2)
     with exp1:
@@ -1028,11 +1023,7 @@ Geographic presets match **exact** country names in the file; unmatched names ar
 
     _sync_trend_selection(countries)
 
-    gg_l, gg_r = st.columns([0.88, 0.12])
-    with gg_l:
-        st.markdown(tr(lang, "h_geo_groups"))
-    with gg_r:
-        _inline_tip(lang, "tip_geo_presets")
+    _markdown_heading_with_tip(lang, tr(lang, "h_geo_groups"), "tip_geo_presets")
     geo_a = st.columns(5)
     for col, label in zip(
         geo_a,
@@ -1068,11 +1059,7 @@ Geographic presets match **exact** country names in the file; unmatched names ar
     with snap[3]:
         st.caption(tr(lang, "caption_n_countries").format(n=len(countries)))
 
-    cd_l, cd_r = st.columns([0.88, 0.12])
-    with cd_l:
-        st.markdown(tr(lang, "h_change_dynamics"))
-    with cd_r:
-        _inline_tip(lang, "tip_dyn_presets")
+    _markdown_heading_with_tip(lang, tr(lang, "h_change_dynamics"), "tip_dyn_presets")
     st.caption(
         f"Metrics use **{year_min}–{year_max}** in this extract. "
         "“vs global” compares each country’s start→end change to the global mean’s start→end change."
@@ -1257,11 +1244,7 @@ Geographic presets match **exact** country names in the file; unmatched names ar
 
         sum_df = trend_summary_table(df, sel_countries, tw0, tw1)
         if len(sum_df) > 0:
-            su_l, su_r = st.columns([0.88, 0.12])
-            with su_l:
-                st.markdown(tr(lang, "h_summary_window"))
-            with su_r:
-                _inline_tip(lang, "tip_trend_summary")
+            _markdown_heading_with_tip(lang, tr(lang, "h_summary_window"), "tip_trend_summary")
             st.dataframe(sum_df, use_container_width=True)
             st.caption(tr(lang, "summary_foot"))
 
