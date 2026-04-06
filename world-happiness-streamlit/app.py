@@ -190,9 +190,8 @@ def _inline_tip(lang: str, key: str) -> None:
 
 
 # Title + ℹ️ in one flat row (no nested st.columns — avoids StreamlitAPIException in sidebar etc.).
-# Weights: [title, tip, empty] sum to 1; empty column keeps ℹ️ near the title, not the viewport edge.
+# Full-width: [title, tip, empty] so ℹ️ stays near the title, not the viewport edge.
 _TIP_HEAD_WEIGHTS_MAIN = (0.44, 0.06, 0.50)
-_TIP_HEAD_WEIGHTS_SUB = (0.70, 0.10, 0.20)
 
 
 def _markdown_heading_with_tip(
@@ -203,8 +202,12 @@ def _markdown_heading_with_tip(
     full_width_row: bool = True,
 ) -> None:
     """Section title with ℹ️ grouped to the left of the row (or within a column)."""
-    wt, wi, we = _TIP_HEAD_WEIGHTS_MAIN if full_width_row else _TIP_HEAD_WEIGHTS_SUB
-    c_title, c_tip, _c_spacer = st.columns([wt, wi, we])
+    if full_width_row:
+        wt, wi, we = _TIP_HEAD_WEIGHTS_MAIN
+        c_title, c_tip, _c_spacer = st.columns([wt, wi, we])
+    else:
+        # Inside st.columns(2): only title + tip (no spacer) so the next widget stays in this column.
+        c_title, c_tip = st.columns([0.88, 0.12])
     with c_title:
         st.markdown(title_md)
     with c_tip:
@@ -771,14 +774,6 @@ using the official Figure 2.1 workbook).
 
     st.divider()
 
-    sm_l, sm_r = st.columns(2)
-    with sm_l:
-        _markdown_heading_with_tip(
-            lang, tr(lang, "h_scatter_drivers"), "tip_scatter_chart", full_width_row=False
-        )
-    with sm_r:
-        _markdown_heading_with_tip(lang, tr(lang, "h_map"), "tip_map", full_width_row=False)
-
     # Scatter
     fit_xy = _safe_polyfit_deg1(df_y[x_metric].values, df_y["Happiness"].values)
     if fit_xy is not None:
@@ -888,10 +883,15 @@ using the official Figure 2.1 workbook).
     iso_to_country = (
         df_y.drop_duplicates("iso_a3").set_index("iso_a3")["Country"].to_dict() if len(df_y) else {}
     )
+    # One columns(2) row: heading + chart per column (separate rows break plotly_events width).
     g1, g2 = st.columns(2)
     with g1:
+        _markdown_heading_with_tip(
+            lang, tr(lang, "h_scatter_drivers"), "tip_scatter_chart", full_width_row=False
+        )
         st.plotly_chart(sc, use_container_width=True, config=plotly_config())
     with g2:
+        _markdown_heading_with_tip(lang, tr(lang, "h_map"), "tip_map", full_width_row=False)
         if HAS_PLOTLY_EVENTS and plotly_events is not None:
             st.caption(tr(lang, "map_click_hint"))
             ev = plotly_events(
@@ -963,20 +963,16 @@ using the official Figure 2.1 workbook).
         height=max(380, rank_n * 22),
     )
 
-    dh_l, dh_r = st.columns(2)
-    with dh_l:
+    g3, g4 = st.columns(2)
+    with g3:
         _markdown_heading_with_tip(
             lang, tr(lang, "h_distribution"), "tip_histogram", full_width_row=False
         )
-    with dh_r:
+        st.plotly_chart(hist, use_container_width=True, config=plotly_config())
+    with g4:
         _markdown_heading_with_tip(
             lang, tr(lang, "h_ranking"), "tip_rank_bars", full_width_row=False
         )
-
-    g3, g4 = st.columns(2)
-    with g3:
-        st.plotly_chart(hist, use_container_width=True, config=plotly_config())
-    with g4:
         st.plotly_chart(br, use_container_width=True, config=plotly_config())
 
     _markdown_heading_with_tip(lang, tr(lang, "h_export_preview"), "tip_export")
