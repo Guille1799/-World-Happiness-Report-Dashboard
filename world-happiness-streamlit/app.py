@@ -189,9 +189,10 @@ def _inline_tip(lang: str, key: str) -> None:
         st.markdown(body)
 
 
-# Title + ℹ️ share a narrow left cluster so the popover stays near the heading, not the viewport edge.
-_TIP_HEAD_CLUSTER_MAIN = 0.52
-_TIP_HEAD_CLUSTER_SUB = 0.88
+# Title + ℹ️ in one flat row (no nested st.columns — avoids StreamlitAPIException in sidebar etc.).
+# Weights: [title, tip, empty] sum to 1; empty column keeps ℹ️ near the title, not the viewport edge.
+_TIP_HEAD_WEIGHTS_MAIN = (0.44, 0.06, 0.50)
+_TIP_HEAD_WEIGHTS_SUB = (0.70, 0.10, 0.20)
 
 
 def _markdown_heading_with_tip(
@@ -202,16 +203,12 @@ def _markdown_heading_with_tip(
     full_width_row: bool = True,
 ) -> None:
     """Section title with ℹ️ grouped to the left of the row (or within a column)."""
-    if full_width_row:
-        cluster, _spacer = st.columns([_TIP_HEAD_CLUSTER_MAIN, 1.0 - _TIP_HEAD_CLUSTER_MAIN])
-    else:
-        cluster, _spacer = st.columns([_TIP_HEAD_CLUSTER_SUB, 1.0 - _TIP_HEAD_CLUSTER_SUB])
-    with cluster:
-        left, right = st.columns([0.88, 0.12])
-        with left:
-            st.markdown(title_md)
-        with right:
-            _inline_tip(lang, tip_key)
+    wt, wi, we = _TIP_HEAD_WEIGHTS_MAIN if full_width_row else _TIP_HEAD_WEIGHTS_SUB
+    c_title, c_tip, _c_spacer = st.columns([wt, wi, we])
+    with c_title:
+        st.markdown(title_md)
+    with c_tip:
+        _inline_tip(lang, tip_key)
 
 
 def _title_with_tip(lang: str, title_md: str, tip_key: str) -> None:
