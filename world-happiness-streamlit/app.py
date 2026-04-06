@@ -610,9 +610,6 @@ def main():
         "figure21": "Official WHR 2026 — Figure 2.1 (three-year rolling national averages)",
         "demo": "Synthetic demonstration dataset",
     }[data_profile]
-    gdp_fit_label = (
-        "log GDP per capita" if data_profile != "figure21" else "GDP contribution to the national score (explained-by)"
-    )
 
     _inject_app_styles()
     st.title("World Happiness Intelligence")
@@ -741,14 +738,6 @@ using the official Figure 2.1 workbook).
     if "Happiness_ci_low" in df_y.columns and "Happiness_ci_high" in df_y.columns:
         st.success(tr(lang, "ci_banner"))
 
-    prev_y = df[df["Year"] == year - 1]
-    global_avg = gavg
-    prev_avg = prev_y["Happiness"].mean() if len(prev_y) else np.nan
-    delta_txt = (
-        tr(lang, "delta_vs_prior").format(delta=global_avg - prev_avg)
-        if np.isfinite(prev_avg)
-        else tr(lang, "na_prior_year")
-    )
     fit = _safe_polyfit_deg1(df_y["GDP"].values, df_y["Happiness"].values)
     if fit is not None:
         pred = np.polyval(fit, df_y["GDP"].values)
@@ -758,39 +747,21 @@ using the official Figure 2.1 workbook).
     df_y = df_y.assign(_resid=resid)
     star = df_y.nlargest(1, "_resid").iloc[0]
 
-    c1, c2 = st.columns(2)
-    with c1:
-        ex_l, ex_r = st.columns([0.88, 0.12])
-        with ex_l:
-            st.markdown(tr(lang, "h_exec_snapshot"))
-        with ex_r:
-            _inline_tip(lang, "tip_exec_snapshot")
-        st.markdown(
-            tr(lang, "exec_snapshot_md").format(
-                year=year,
-                gavg=global_avg,
-                delta_txt=delta_txt,
-                gdp_fit_label=gdp_fit_label,
-                star=star["Country"],
-                wh_source=wh_source,
-            )
+    in_l, in_r = st.columns([0.88, 0.12])
+    with in_l:
+        st.markdown(tr(lang, "h_interp_notes"))
+    with in_r:
+        _inline_tip(lang, "tip_interp_notes")
+    rng = df_y["Happiness"].max() - df_y["Happiness"].min()
+    st.markdown(
+        tr(lang, "interp_notes_md").format(
+            year=year,
+            rng=rng,
+            x_label=x_label,
+            r_str=r_str,
+            star=star["Country"],
         )
-    with c2:
-        in_l, in_r = st.columns([0.88, 0.12])
-        with in_l:
-            st.markdown(tr(lang, "h_interp_notes"))
-        with in_r:
-            _inline_tip(lang, "tip_interp_notes")
-        rng = df_y["Happiness"].max() - df_y["Happiness"].min()
-        st.markdown(
-            tr(lang, "interp_notes_md").format(
-                year=year,
-                rng=rng,
-                x_label=x_label,
-                r_str=r_str,
-                star=star["Country"],
-            )
-        )
+    )
 
     st.divider()
 

@@ -32,7 +32,6 @@ UI: dict[str, dict[str, str]] = {
         "tip_cross_section": "Snapshot for one calendar year: how countries compare on life evaluation and the selected driver. Correlations are cross-sectional (same year), not causal. Population scales marker size when World Bank data is available.",
         "tip_glance": "Pearson r measures linear association between the selected driver (X) and life evaluation (Y) across countries in that year. Values near 1 or -1 mean a strong straight-line relationship; near 0 means little linear co-movement. This does not imply causation.",
         "tip_insights_auto": "Short bullets generated from the current table: correlation, top country, cross-country spread, and (in the trend block) changes among selected countries in the chosen window.",
-        "tip_exec_snapshot": "Residual = actual life evaluation minus a simple straight-line prediction from GDP (log GDP in legacy data; explained-by GDP in Figure 2.1). Highlights who sits above that benchmark in this year.",
         "tip_interp_notes": "Spread = max minus min of national life evaluations. Together with r, it summarizes how tightly the driver and happiness line up across countries (descriptive only).",
         "tip_scatter_chart": "Each marker = one country. Y = life evaluation (Cantril ladder, 0–10). X = driver chosen in the sidebar (Figure 2.1: explained-by contributions to the score, not raw survey values). Marker area scales with population. Color encodes life evaluation. Vertical segments (if present) = uncertainty range from the WHR file (whiskers). The blue line is an OLS linear fit; r is Pearson correlation (association, not causation).",
         "tip_map": "Choropleth: country color = life evaluation for the reference year (same as cross-section). ISO-3 codes link shapes to countries. If streamlit-plotly-events is installed, clicking a country can add it to the trend list.",
@@ -50,11 +49,6 @@ UI: dict[str, dict[str, str]] = {
         "h_at_glance": "### At a glance",
         "info_at_glance": "**{year}** · **{n_ct}** countries · Pearson **r** between **{x_label}** and life evaluation: **≈ {r_str}** {assoc}",
         "assoc_only": "(cross-sectional association only.)",
-        "na_prior_year": "n/a (no prior year in sample)",
-        "delta_vs_prior": "{delta:+.2f} vs prior year (unweighted global mean)",
-        "exec_snapshot_md": "- Unweighted global mean in **{year}**: **{gavg:.2f}** ({delta_txt}).\n"
-        "- Largest **positive residual** vs a simple linear fit on **{gdp_fit_label}**: **{star}**.\n"
-        "- _Source: {wh_source}_",
         "interp_notes_md": "- In **{year}**, cross-country spread in life evaluation is **{rng:.2f}** ladder points (max − min).\n"
         "- **{x_label}** co-moves with life evaluation at **r ≈ {r_str}** (descriptive only).\n"
         "- **{star}** sits above the linear GDP-dimension benchmark (illustrative residual).",
@@ -132,7 +126,6 @@ UI: dict[str, dict[str, str]] = {
         "tip_cross_section": "Vista de un solo año: comparación entre países en evaluación de vida y la variable elegida. Las correlaciones son transversales (mismo año), no causales. El tamaño del marcador escala con población cuando hay datos del Banco Mundial.",
         "tip_glance": "La r de Pearson mide asociación lineal entre la variable del eje X y la evaluación de vida (Y) entre países ese año. Valores cerca de 1 o -1 indican relación casi lineal; cerca de 0, poca asociación lineal. No implica causalidad.",
         "tip_insights_auto": "Viñetas generadas a partir de la tabla actual: correlación, país con mayor valor, dispersión entre países y (en tendencia) cambios entre países elegidos en la ventana.",
-        "tip_exec_snapshot": "Residual = evaluación de vida real menos la predicción de una recta simple con el PIB (log PIB en datos legacy; PIB explicado en Fig. 2.1). Destaca quién queda por encima de esa referencia este año.",
         "tip_interp_notes": "Dispersión = máximo menos mínimo de evaluaciones nacionales. Junto con r, resume cómo se alinean variable y felicidad entre países (solo descriptivo).",
         "tip_scatter_chart": "Cada punto = un país. Y = evaluación de vida (escala Cantril 0–10). X = variable del panel lateral (en Fig. 2.1 son aportaciones explicadas a la puntuación, no valores crudos). El área del marcador escala con población. El color codifica evaluación de vida. Las barras verticales (si hay) = rango de incertidumbre del archivo WHR (bigotes). La recta azul es un ajuste OLS; r es correlación de Pearson (asociación, no causalidad).",
         "tip_map": "Coropletas: el color = evaluación de vida del año de referencia (igual que arriba). Códigos ISO-3 enlazan forma y país. Con streamlit-plotly-events, un clic puede añadir el país a la tendencia.",
@@ -150,11 +143,6 @@ UI: dict[str, dict[str, str]] = {
         "h_at_glance": "### De un vistazo",
         "info_at_glance": "**{year}** · **{n_ct}** países · correlación de Pearson **r** entre **{x_label}** y evaluación de vida: **≈ {r_str}** {assoc}",
         "assoc_only": "(solo asociación transversal.)",
-        "na_prior_year": "n/d (no hay año previo en el extracto)",
-        "delta_vs_prior": "{delta:+.2f} vs año anterior (media global no ponderada)",
-        "exec_snapshot_md": "- Media global no ponderada en **{year}**: **{gavg:.2f}** ({delta_txt}).\n"
-        "- Mayor **residuo positivo** frente a un ajuste lineal simple en **{gdp_fit_label}**: **{star}**.\n"
-        "- _Fuente: {wh_source}_",
         "interp_notes_md": "- En **{year}**, la dispersión entre países en evaluación de vida es de **{rng:.2f}** puntos (máx − mín).\n"
         "- **{x_label}** co-varía con la evaluación de vida con **r ≈ {r_str}** (solo descriptivo).\n"
         "- **{star}** queda por encima del referente lineal en la dimensión PIB (residuo ilustrativo).",
@@ -168,7 +156,6 @@ UI: dict[str, dict[str, str]] = {
         "h_distribution": "##### Distribución",
         "h_ranking": "##### Ranking (top / bottom)",
         "h_export_preview": "##### Exportar y vista previa",
-        "h_exec_snapshot": "#### Resumen ejecutivo",
         "h_interp_notes": "#### Notas de interpretación",
         "h_geo_groups": "##### Grupos geográficos",
         "h_ref_year": "##### Año de referencia (como arriba)",
