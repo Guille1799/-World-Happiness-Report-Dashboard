@@ -6,7 +6,12 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
 Exploratory analytics UI for **national life evaluations** (Cantril ladder, 0–10) and WHR-style drivers: **Plotly** maps, scatter plots, distributions, multi-country **trends**, CSV export, and **EN/ES** UI strings.  
-**Live app:** [world-happiness-report-dash.streamlit.app](https://world-happiness-report-dash.streamlit.app/)
+**Live app:** [world-happiness-report-dash.streamlit.app](https://world-happiness-report-dash.streamlit.app/)  
+**Repository:** [github.com/Guille1799/-World-Happiness-Report-Dashboard](https://github.com/Guille1799/-World-Happiness-Report-Dashboard)
+
+### Why this exists
+
+Wellbeing and life evaluation are central to policy debates—but the underlying data is often locked in spreadsheets or notebooks. This dashboard is a **communication and analysis tool**: it makes cross-country comparisons, **driver associations** (descriptive, not causal), and **time trends** accessible to researchers, educators, and journalists who need **linked views** without re-running code for every question. It is built in the spirit of **transparent measurement**: showing uncertainty where the data allows, avoiding over-claiming, and keeping the distinction between **association** and **causation** visible in the UI.
 
 ### Case study (short)
 
