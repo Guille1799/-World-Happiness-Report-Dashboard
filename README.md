@@ -1,13 +1,13 @@
 # World Happiness Report — Interactive Dashboard
 
-[![CI](https://github.com/Guille1799/-World-Happiness-Report-Dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/Guille1799/-World-Happiness-Report-Dashboard/actions/workflows/ci.yml)
+[![CI](https://github.com/Guille1799/World-Happiness-Report-Dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/Guille1799/World-Happiness-Report-Dashboard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Streamlit](https://img.shields.io/badge/Built%20with-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
 Exploratory analytics UI for **national life evaluations** (Cantril ladder, 0–10) and WHR-style drivers: **Plotly** maps, scatter plots, distributions, multi-country **trends**, CSV export, and **EN/ES** UI strings.  
 **Live app:** [world-happiness-report-dash.streamlit.app](https://world-happiness-report-dash.streamlit.app/)  
-**Repository:** [github.com/Guille1799/-World-Happiness-Report-Dashboard](https://github.com/Guille1799/-World-Happiness-Report-Dashboard)
+**Repository:** [github.com/Guille1799/World-Happiness-Report-Dashboard](https://github.com/Guille1799/World-Happiness-Report-Dashboard)
 
 ### Why this exists
 

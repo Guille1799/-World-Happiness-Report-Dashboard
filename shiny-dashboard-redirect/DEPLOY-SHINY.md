@@ -33,10 +33,10 @@ This stores credentials for future deploys.
 In R:
 
 ```r
-setwd("C:/Users/Guille/Downloads/JOB Assist/shiny-dashboard-redirect")
+setwd("/path/to/World-Happiness-Report-Dashboard/shiny-dashboard-redirect")
 ```
 
-Adjust the path if you moved the `JOB Assist` folder.
+Use the path where you cloned this repository.
 
 ## Step 3 — Deploy
 
@@ -49,11 +49,11 @@ source("deploy.R")
 **Option B — PowerShell** (no R GUI):
 
 ```powershell
-cd "C:\Users\Guille\Downloads\JOB Assist\shiny-dashboard-redirect"
-& "C:\Program Files\R\R-4.5.3\bin\Rscript.exe" deploy.R
+cd "path\to\World-Happiness-Report-Dashboard\shiny-dashboard-redirect"
+& "C:\Program Files\R\R-<version>\bin\Rscript.exe" deploy.R
 ```
 
-(Change the R version folder if yours differs.)
+(Replace `<version>` with your installed R version, e.g. `R-4.5.3`.)
 
 If prompted **“Discovered a previously deployed app named Dashboard”**, choose **`1`** to **update** the existing app and keep the same public URL.
 

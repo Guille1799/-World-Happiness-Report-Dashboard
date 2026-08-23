@@ -46,4 +46,4 @@ Thanks for helping improve this project.
 
 ## Questions
 
-Open a [GitHub issue](https://github.com/Guille1799/-World-Happiness-Report-Dashboard/issues) for bugs or feature ideas.
+Open a [GitHub issue](https://github.com/Guille1799/World-Happiness-Report-Dashboard/issues) for bugs or feature ideas.
