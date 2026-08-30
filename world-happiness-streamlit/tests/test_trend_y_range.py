@@ -18,7 +18,7 @@ from app import trend_y_range
 def test_a_narrow_band_gets_a_narrow_axis():
     lo, hi = trend_y_range(7.2, 7.9)
     assert lo < 7.2 and hi > 7.9
-    assert hi - lo < 1.5, "the axis is still far wider than the data: %r" % [lo, hi]
+    assert hi - lo < 1.5, f"the axis is still far wider than the data: {[lo, hi]!r}"
 
 
 def test_a_flat_series_still_gets_a_visible_axis():
