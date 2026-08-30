@@ -91,6 +91,22 @@ _CROSS_ROW_PLOT_HEIGHT = 520
 _MAP_HEIGHT = 460
 
 
+def trend_y_range(lo: float, hi: float) -> list[float]:
+    """Y-axis range for the trend chart: the data, plus a little air.
+
+    The axis used to span the whole dataset (1 to 8), so five Nordic countries
+    between 7.2 and 7.9 were drawn as five lines on top of each other. Nothing
+    to compare.
+
+    The floor of 0.15 matters for the flat case: when every picked country sits
+    at the same value the span is 0, and a proportional pad would still be 0 --
+    plotly would get a zero-height axis.
+    """
+    lo, hi = float(min(lo, hi)), float(max(lo, hi))
+    pad = max(0.15, (hi - lo) * 0.12)
+    return [max(0.0, lo - pad), min(10.0, hi + pad)]
+
+
 def _inject_app_styles() -> None:
     st.markdown(
         """
@@ -1041,143 +1057,113 @@ using the official Figure 2.1 workbook).
     st.divider()
     _title_with_tip(lang, tr(lang, "trend_h"), "tip_trend_section")
     st.caption(tr(lang, "trend_caption_intro").format(max_c=MAX_TREND_COUNTRIES))
-    with st.expander("How dynamic presets are defined", expanded=False):
-        st.markdown(
-            """
-| Preset | Definition |
-|--------|------------|
-| **Largest gain / decline** | Life evaluation in the **last** year minus the **first** year available for that country in this dataset (not necessarily every calendar year). |
-| **Most volatile** | Highest **standard deviation** of annual life evaluations within the country (≥3 years required). |
-| **Largest range** | Largest **max − min** of life evaluation within the country’s series. |
-| **Outpaced / trailed global** | Country **(last − first)** minus **global mean (last − first)** over the same year range. |
-| **Steepest slope** | OLS slope of life evaluation on **calendar year** (≥3 years). |
 
-Geographic presets match **exact** country names in the file; unmatched names are skipped.
-            """
+    # Dos huecos, para que el orden de lectura y el de ejecucion puedan diferir.
+    # El selector de paises tiene que salir PRIMERO en pantalla. Los botones de
+    # atajo tienen que EJECUTARSE primero: escriben st.session_state.trend_countries,
+    # y Streamlit no deja tocar esa clave una vez creado el widget que la usa.
+    hueco_selector = st.container()
+    hueco_atajos = st.container()
+
+    with hueco_atajos:
+        with st.expander(tr(lang, "trend_presets_h"), expanded=False):
+            _markdown_heading_with_tip(lang, tr(lang, "h_geo_groups"), "tip_geo_presets")
+            geo_a = st.columns(5)
+            for col, label in zip(
+                geo_a,
+                ["Nordic", "G7", "Western EU", "Americas", "Asia–Pacific"],
+            ):
+                with col:
+                    if st.button(label, key=f"preset_geo_{label}", use_container_width=True):
+                        st.session_state.trend_countries = apply_preset(label, countries)
+            geo_b = st.columns(4)
+            for col, label in zip(
+                geo_b,
+                ["Benelux", "Baltic", "Southern EU", "English-speaking"],
+            ):
+                with col:
+                    if st.button(label, key=f"preset_geo_{label}", use_container_width=True):
+                        st.session_state.trend_countries = apply_preset(label, countries)
+
+            st.markdown(tr(lang, "h_ref_year"))
+            snap = st.columns(4)
+            with snap[0]:
+                if st.button(tr(lang, "btn_top5"), use_container_width=True, key="btn_top5"):
+                    st.session_state.trend_countries = (
+                        df_y.nlargest(5, "Happiness")["Country"].tolist()[:MAX_TREND_COUNTRIES]
+                    )
+            with snap[1]:
+                if st.button(tr(lang, "btn_bot5"), use_container_width=True, key="btn_bot5"):
+                    st.session_state.trend_countries = (
+                        df_y.nsmallest(5, "Happiness")["Country"].tolist()[:MAX_TREND_COUNTRIES]
+                    )
+            with snap[2]:
+                if st.button(tr(lang, "btn_clear"), use_container_width=True, key="btn_clear"):
+                    st.session_state.trend_countries = []
+            with snap[3]:
+                st.caption(tr(lang, "caption_n_countries").format(n=len(countries)))
+
+            _markdown_heading_with_tip(lang, tr(lang, "h_change_dynamics"), "tip_dyn_presets")
+            st.caption(
+                f"Metrics use **{year_min}–{year_max}** in this extract. "
+                "“vs global” compares each country’s start→end change to the global mean’s start→end change."
+            )
+            dyn_a = st.columns(4)
+            with dyn_a[0]:
+                if st.button(tr(lang, "dyn_gain"), use_container_width=True, key="dyn_gain"):
+                    st.session_state.trend_countries = trend_biggest_gains(df, MAX_TREND_COUNTRIES)
+            with dyn_a[1]:
+                if st.button(tr(lang, "dyn_loss"), use_container_width=True, key="dyn_loss"):
+                    st.session_state.trend_countries = trend_biggest_losses(df, MAX_TREND_COUNTRIES)
+            with dyn_a[2]:
+                if st.button(tr(lang, "dyn_vol"), use_container_width=True, key="dyn_vol"):
+                    st.session_state.trend_countries = trend_most_volatile(df, MAX_TREND_COUNTRIES)
+            with dyn_a[3]:
+                if st.button(tr(lang, "dyn_range"), use_container_width=True, key="dyn_range"):
+                    st.session_state.trend_countries = trend_largest_range(df, MAX_TREND_COUNTRIES)
+
+            dyn_b = st.columns(4)
+            with dyn_b[0]:
+                if st.button(tr(lang, "dyn_beat"), use_container_width=True, key="dyn_beat"):
+                    st.session_state.trend_countries = trend_vs_global_delta_spread(df, MAX_TREND_COUNTRIES, beat=True)
+            with dyn_b[1]:
+                if st.button(tr(lang, "dyn_lag"), use_container_width=True, key="dyn_lag"):
+                    st.session_state.trend_countries = trend_vs_global_delta_spread(df, MAX_TREND_COUNTRIES, beat=False)
+            with dyn_b[2]:
+                if st.button(tr(lang, "dyn_slope_up"), use_container_width=True, key="dyn_slope_up"):
+                    st.session_state.trend_countries = trend_by_slope(df, MAX_TREND_COUNTRIES, positive=True)
+            with dyn_b[3]:
+                if st.button(tr(lang, "dyn_slope_dn"), use_container_width=True, key="dyn_slope_dn"):
+                    st.session_state.trend_countries = trend_by_slope(df, MAX_TREND_COUNTRIES, positive=False)
+        with st.expander("How dynamic presets are defined", expanded=False):
+            st.markdown(
+                """
+    | Preset | Definition |
+    |--------|------------|
+    | **Largest gain / decline** | Life evaluation in the **last** year minus the **first** year available for that country in this dataset (not necessarily every calendar year). |
+    | **Most volatile** | Highest **standard deviation** of annual life evaluations within the country (≥3 years required). |
+    | **Largest range** | Largest **max − min** of life evaluation within the country’s series. |
+    | **Outpaced / trailed global** | Country **(last − first)** minus **global mean (last − first)** over the same year range. |
+    | **Steepest slope** | OLS slope of life evaluation on **calendar year** (≥3 years). |
+
+    Geographic presets match **exact** country names in the file; unmatched names are skipped.
+                """
+            )
+
+        _sync_trend_selection(countries)
+
+
+    with hueco_selector:
+        sel_countries = st.multiselect(
+            tr(lang, "trend_multiselect_label"),
+            options=sorted(countries),
+            key="trend_countries",
+            max_selections=MAX_TREND_COUNTRIES,
+            help=tr(lang, "help_trend_multiselect"),
         )
+        n_sel = len(sel_countries)
+        st.caption(f"**{n_sel} / {MAX_TREND_COUNTRIES}** countries selected.")
 
-    _sync_trend_selection(countries)
-
-    _markdown_heading_with_tip(lang, tr(lang, "h_geo_groups"), "tip_geo_presets")
-    geo_a = st.columns(5)
-    for col, label in zip(
-        geo_a,
-        ["Nordic", "G7", "Western EU", "Americas", "Asia–Pacific"],
-    ):
-        with col:
-            if st.button(label, key=f"preset_geo_{label}", use_container_width=True):
-                st.session_state.trend_countries = apply_preset(label, countries)
-    geo_b = st.columns(4)
-    for col, label in zip(
-        geo_b,
-        ["Benelux", "Baltic", "Southern EU", "English-speaking"],
-    ):
-        with col:
-            if st.button(label, key=f"preset_geo_{label}", use_container_width=True):
-                st.session_state.trend_countries = apply_preset(label, countries)
-
-    st.markdown(tr(lang, "h_ref_year"))
-    snap = st.columns(4)
-    with snap[0]:
-        if st.button(tr(lang, "btn_top5"), use_container_width=True, key="btn_top5"):
-            st.session_state.trend_countries = (
-                df_y.nlargest(5, "Happiness")["Country"].tolist()[:MAX_TREND_COUNTRIES]
-            )
-    with snap[1]:
-        if st.button(tr(lang, "btn_bot5"), use_container_width=True, key="btn_bot5"):
-            st.session_state.trend_countries = (
-                df_y.nsmallest(5, "Happiness")["Country"].tolist()[:MAX_TREND_COUNTRIES]
-            )
-    with snap[2]:
-        if st.button(tr(lang, "btn_clear"), use_container_width=True, key="btn_clear"):
-            st.session_state.trend_countries = []
-    with snap[3]:
-        st.caption(tr(lang, "caption_n_countries").format(n=len(countries)))
-
-    _markdown_heading_with_tip(lang, tr(lang, "h_change_dynamics"), "tip_dyn_presets")
-    st.caption(
-        f"Metrics use **{year_min}–{year_max}** in this extract. "
-        "“vs global” compares each country’s start→end change to the global mean’s start→end change."
-    )
-    dyn_a = st.columns(4)
-    with dyn_a[0]:
-        if st.button(tr(lang, "dyn_gain"), use_container_width=True, key="dyn_gain"):
-            st.session_state.trend_countries = trend_biggest_gains(df, MAX_TREND_COUNTRIES)
-    with dyn_a[1]:
-        if st.button(tr(lang, "dyn_loss"), use_container_width=True, key="dyn_loss"):
-            st.session_state.trend_countries = trend_biggest_losses(df, MAX_TREND_COUNTRIES)
-    with dyn_a[2]:
-        if st.button(tr(lang, "dyn_vol"), use_container_width=True, key="dyn_vol"):
-            st.session_state.trend_countries = trend_most_volatile(df, MAX_TREND_COUNTRIES)
-    with dyn_a[3]:
-        if st.button(tr(lang, "dyn_range"), use_container_width=True, key="dyn_range"):
-            st.session_state.trend_countries = trend_largest_range(df, MAX_TREND_COUNTRIES)
-
-    dyn_b = st.columns(4)
-    with dyn_b[0]:
-        if st.button(tr(lang, "dyn_beat"), use_container_width=True, key="dyn_beat"):
-            st.session_state.trend_countries = trend_vs_global_delta_spread(df, MAX_TREND_COUNTRIES, beat=True)
-    with dyn_b[1]:
-        if st.button(tr(lang, "dyn_lag"), use_container_width=True, key="dyn_lag"):
-            st.session_state.trend_countries = trend_vs_global_delta_spread(df, MAX_TREND_COUNTRIES, beat=False)
-    with dyn_b[2]:
-        if st.button(tr(lang, "dyn_slope_up"), use_container_width=True, key="dyn_slope_up"):
-            st.session_state.trend_countries = trend_by_slope(df, MAX_TREND_COUNTRIES, positive=True)
-    with dyn_b[3]:
-        if st.button(tr(lang, "dyn_slope_dn"), use_container_width=True, key="dyn_slope_dn"):
-            st.session_state.trend_countries = trend_by_slope(df, MAX_TREND_COUNTRIES, positive=False)
-
-    st.markdown(tr(lang, "h_search_add"))
-    q = st.text_input(
-        tr(lang, "trend_search_label"),
-        placeholder=tr(lang, "trend_search_ph"),
-        key="trend_search_q",
-        help=tr(lang, "help_trend_search"),
-    )
-    add_options = [c for c in sorted(countries) if q.strip() and q.lower() in c.lower()][:50]
-    add_row = st.columns([2, 2, 1])
-    with add_row[0]:
-        if add_options:
-            pick = st.selectbox(
-                "Matching country",
-                options=add_options,
-                key="trend_add_pick",
-                label_visibility="collapsed",
-            )
-        else:
-            pick = None
-            if q.strip():
-                st.caption(tr(lang, "search_no_match"))
-            else:
-                st.caption(tr(lang, "search_prompt"))
-    with add_row[1]:
-        n_cur = len(st.session_state.get("trend_countries", []))
-        at_cap = n_cur >= MAX_TREND_COUNTRIES
-        can_add = pick is not None and not at_cap and pick not in st.session_state.get("trend_countries", [])
-        if st.button(
-            tr(lang, "trend_add"),
-            use_container_width=True,
-            key="btn_add_one",
-            disabled=not can_add,
-            help="Disabled if list is full, no match, or country already selected.",
-        ):
-            if can_add and pick:
-                cur = list(st.session_state.trend_countries)
-                cur.append(pick)
-                st.session_state.trend_countries = cur[:MAX_TREND_COUNTRIES]
-    with add_row[2]:
-        if at_cap:
-            st.caption(tr(lang, "list_full"))
-
-    sel_countries = st.multiselect(
-        tr(lang, "trend_multiselect_label"),
-        options=sorted(countries),
-        key="trend_countries",
-        max_selections=MAX_TREND_COUNTRIES,
-        help=tr(lang, "help_trend_multiselect"),
-    )
-    n_sel = len(sel_countries)
-    st.caption(f"**{n_sel} / {MAX_TREND_COUNTRIES}** countries selected.")
 
     if not sel_countries:
         st.warning(tr(lang, "warn_pick_country"))
@@ -1194,7 +1180,12 @@ Geographic presets match **exact** country names in the file; unmatched names ar
             "Years shown in trend chart (and in summary / export)",
             min_value=year_min,
             max_value=year_max,
-            value=(year_min, year_max),
+            # No `value=` when the key already holds one. The window is seeded
+            # from the URL (?t0=&t1=) further up, and passing a default as well
+            # makes Streamlit print a yellow warning box in the page: "created
+            # with a default value but also had its value set via the Session
+            # State API". The reader sees a warning about our plumbing.
+            **({} if "trend_year_window" in st.session_state else {"value": (year_min, year_max)}),
             key="trend_year_window",
             help=tr(lang, "help_trend_year_slider"),
         )
@@ -1245,12 +1236,24 @@ Geographic presets match **exact** country names in the file; unmatched names ar
                 hovertemplate="Global mean<br>Year %{x}<br>%{y:.2f}<extra></extra>",
             )
         )
+        # Fit the y-axis to what is actually on the chart: the picked countries
+        # and the global-mean line. It used to span the whole dataset's range,
+        # so five Nordic countries between 7.2 and 7.9 were drawn as five lines
+        # on top of each other at the top of a 1-to-8 axis. Nothing to compare.
+        #
+        # The axis is not zero-based, which exaggerates differences if you read
+        # the gaps as sizes. The dashed global mean is always inside the range,
+        # so there is a fixed anchor to read the gaps against, and the caption
+        # under the chart says the axis is cropped.
+        vis_lo = float(min(df_l_plot["Happiness"].min(), glob_plot["GlobalAvg"].min()))
+        vis_hi = float(max(df_l_plot["Happiness"].max(), glob_plot["GlobalAvg"].max()))
+        y_range = trend_y_range(vis_lo, vis_hi)
         fig.update_layout(
             template="plotly_white",
             title=dict(text=f"Life evaluation vs global mean · {tw0}–{tw1}", font=dict(size=16)),
             paper_bgcolor="#ffffff",
             plot_bgcolor="#fafbfc",
-            yaxis=dict(range=[np.floor(happy_min), np.ceil(happy_max)], title="Life evaluation"),
+            yaxis=dict(range=y_range, title="Life evaluation (0–10 scale, axis cropped to the data)"),
             xaxis_title="Year",
             legend=dict(orientation="h", yanchor="bottom", y=-0.32, x=0.5, xanchor="center"),
             margin=dict(t=48, b=100),
