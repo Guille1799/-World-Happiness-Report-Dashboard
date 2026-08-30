@@ -98,10 +98,24 @@ def compute_insights(
                 f"Mayor **mejora** en la ventana ({tw0}–{tw1}) entre los elegidos: **{best_c}** (Δ ≈ {best_d:+.2f})."
             )
         if worst_c is not None and worst_c != best_c:
+            # worst_d is the smallest change in the window. That is only a
+            # decline when it is negative. When every pick rose, the one that
+            # rose least was still announced as "Largest decline", with a
+            # positive delta printed right next to the word.
+            fell = worst_d < 0
             if lang == "en":
-                out.append(f"Largest **decline** among picks: **{worst_c}** (Δ ≈ {worst_d:+.2f}).")
+                line = (
+                    f"Largest **decline** among picks: **{worst_c}** (Δ ≈ {worst_d:+.2f})."
+                    if fell
+                    else f"Smallest **gain** among picks: **{worst_c}** (Δ ≈ {worst_d:+.2f})."
+                )
             else:
-                out.append(f"Mayor **caída** entre los elegidos: **{worst_c}** (Δ ≈ {worst_d:+.2f}).")
+                line = (
+                    f"Mayor **caída** entre los elegidos: **{worst_c}** (Δ ≈ {worst_d:+.2f})."
+                    if fell
+                    else f"Menor **subida** entre los elegidos: **{worst_c}** (Δ ≈ {worst_d:+.2f})."
+                )
+            out.append(line)
 
     if include_cross_section:
         rng = float(df_y["Happiness"].max() - df_y["Happiness"].min())

@@ -35,14 +35,6 @@ try:
 except ImportError:
     coco = None
 
-try:
-    from streamlit_plotly_events import plotly_events
-
-    HAS_PLOTLY_EVENTS = True
-except ImportError:
-    plotly_events = None
-    HAS_PLOTLY_EVENTS = False
-
 
 def _qp_get_int(qp: object, key: str, lo: int, hi: int, default: int) -> int:
     try:
@@ -94,12 +86,33 @@ FIGURE21_X_LABELS = {
 
 # Scatter vs map row: same height so the choropleth matches the scatter; plotly_events needs matching override_height.
 _CROSS_ROW_PLOT_HEIGHT = 520
+# The map has its own row now, so it gets its own height: a world map at full
+# width wants to be wide and shallow, not square.
+_MAP_HEIGHT = 460
 
 
 def _inject_app_styles() -> None:
     st.markdown(
         """
 <style>
+    /* Cap the reading column. The page is set to layout="wide", so on a large
+       monitor it ran edge to edge: the four headline metrics ended up almost a
+       screen apart and stopped reading as one row. */
+    .block-container {
+        max-width: 1480px;
+        padding-top: 1.8rem;
+        padding-bottom: 3rem;
+    }
+    /* Group the headline numbers into cards so the eye takes them as a set. */
+    div[data-testid="stMetric"] {
+        background: #f8fafc;
+        border: 1px solid #e6eaf0;
+        border-radius: 10px;
+        padding: 0.8rem 1rem;
+    }
+    div[data-testid="stMetric"] label p { color: #64748b; font-size: 0.82rem; }
+    /* Sections need air between them, or every block looks equally important. */
+    h2, h3 { margin-top: 1.4rem; }
     .whr-main-title { font-weight: 700; letter-spacing: -0.03em; color: #0f172a; margin-bottom: 0.15rem; }
     .whr-sub { color: #64748b; font-size: 0.95rem; margin-top: 0; }
     div[data-testid="stSidebarHeader"] { padding-bottom: 0.5rem; }
@@ -899,52 +912,49 @@ using the official Figure 2.1 workbook).
     )
     mp.update_layout(
         title=f"Geographic distribution · {year}",
-        height=_CROSS_ROW_PLOT_HEIGHT,
+        height=_MAP_HEIGHT,
         geo=dict(
             showframe=False,
             projection_type="natural earth",
-            projection_scale=1.12,
-            bgcolor="#eef2ff",
-            landcolor="#e2e8f0",
+            # Crop Antarctica and the empty water below it. A full-globe frame
+            # spends about a quarter of its height on land nobody is ranked in,
+            # which is why the map looked small next to the scatter beside it.
+            lataxis=dict(range=[-56, 84]),
+            lonaxis=dict(range=[-172, 182]),
+            bgcolor="rgba(0,0,0,0)",
+            landcolor="#e8edf3",
             showocean=True,
             oceancolor="#f8fafc",
+            showcountries=True,
+            countrycolor="#ffffff",
         ),
-        margin=dict(l=0, r=0, t=50, b=0),
+        margin=dict(l=0, r=0, t=44, b=0),
     )
 
-    iso_to_country = (
-        df_y.drop_duplicates("iso_a3").set_index("iso_a3")["Country"].to_dict() if len(df_y) else {}
+    # Scatter first, full width. Then the map, also full width.
+    #
+    # They used to share a columns(2) row. A world map is about twice as wide as
+    # it is tall, so in half a column plotly fitted it to the height and drew it
+    # 284px wide inside a 636px box: a postage stamp with white space either
+    # side. Stacked, each chart gets the whole reading column.
+    _markdown_heading_with_tip(
+        lang, tr(lang, "h_scatter_drivers"), "tip_scatter_chart", full_width_row=False
     )
-    # One columns(2) row: heading + chart per column (separate rows break plotly_events width).
-    g1, g2 = st.columns(2)
-    with g1:
-        _markdown_heading_with_tip(
-            lang, tr(lang, "h_scatter_drivers"), "tip_scatter_chart", full_width_row=False
-        )
-        st.plotly_chart(sc, use_container_width=True, config=plotly_config())
+    st.plotly_chart(sc, use_container_width=True, config=plotly_config())
+
+    g2 = st.container()
     with g2:
         _markdown_heading_with_tip(lang, tr(lang, "h_map"), "tip_map", full_width_row=False)
-        if HAS_PLOTLY_EVENTS and plotly_events is not None:
-            st.caption(tr(lang, "map_click_hint"))
-            ev = plotly_events(
-                mp,
-                click_event=True,
-                key="map_click_events",
-                override_height=_CROSS_ROW_PLOT_HEIGHT,
-                override_width="100%",
-            )
-            if ev:
-                for pt in ev:
-                    loc = pt.get("location") or (pt.get("point") or {}).get("location")
-                    if loc and loc in iso_to_country:
-                        cname = iso_to_country[loc]
-                        cur = list(st.session_state.get("trend_countries", []))
-                        if cname not in cur and len(cur) < MAX_TREND_COUNTRIES:
-                            cur.append(cname)
-                            st.session_state.trend_countries = cur
-        else:
-            st.caption(tr(lang, "map_click_pkg"))
-            st.plotly_chart(mp, use_container_width=True, config=plotly_config())
+        # The map is drawn with st.plotly_chart, not with plotly_events.
+        #
+        # plotly_events made the map clickable, and cost two things to get it.
+        # It drew the map 284px wide inside a 1320px row -- a stamp with white
+        # space either side -- and it bundles an old plotly.js that cannot read
+        # the binary array format newer plotly versions emit, so under plotly 6
+        # the countries came out blank. Clicking a country is a convenience;
+        # the trend list can be built from the sidebar selector. A map nobody
+        # can read is not a trade worth making.
+        st.plotly_chart(mp, use_container_width=True, config=plotly_config())
 
     # Histogram + bar
     mu = df_y["Happiness"].mean()
