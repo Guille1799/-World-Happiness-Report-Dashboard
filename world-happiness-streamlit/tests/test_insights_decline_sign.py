@@ -37,7 +37,7 @@ def test_everyone_rose_so_nobody_declined():
     """+0.60 and +0.10 are both gains. Neither is a decline."""
     out = _lines({"Finland": (7.0, 7.6), "Spain": (6.0, 6.1)})
     assert "decline" not in out.lower(), (
-        "the smallest gain was announced as a decline: %r" % out
+        f"the smallest gain was announced as a decline: {out!r}"
     )
     assert "smallest **gain**" in out.lower() or "smallest gain" in out.lower()
 
