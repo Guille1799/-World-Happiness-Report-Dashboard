@@ -128,6 +128,20 @@ def _truthy_env_or_secret(val: object) -> bool:
     return s in ("1", "true", "yes", "on")
 
 
+def _has_secrets_file() -> bool:
+    """True only when a secrets file actually exists.
+
+    Touching ``st.secrets`` with no secrets file does not just raise: Streamlit
+    paints a red error box in the app first, so wrapping the access in
+    ``try/except`` hides the exception and not the box. Running the app locally
+    showed three of those stacked above the page.
+    """
+    try:
+        return bool(st.secrets.load_if_toml_exists())
+    except Exception:
+        return False
+
+
 def _hide_demo_banner() -> bool:
     """Hide the yellow demo strip (env vars or Streamlit Cloud Secrets)."""
     keys = ("WHR_HIDE_DEMO_BANNER", "HIDE_DEMO_BANNER")
@@ -135,6 +149,8 @@ def _hide_demo_banner() -> bool:
         v = os.environ.get(k)
         if v is not None and _truthy_env_or_secret(v):
             return True
+    if not _has_secrets_file():
+        return False
     try:
         sec = st.secrets
         for k in keys:
@@ -150,32 +166,42 @@ def _hide_demo_banner() -> bool:
 
 
 def _render_demo_mode_banner() -> None:
-    """Full-bleed banner at the very top of the page (above main column width)."""
+    """Banner at the top of the main column.
+
+    It stays inside the content column on purpose. The previous version was
+    full-bleed (``width: 100vw`` pulled left by ``margin-left: -50vw``), so on a
+    desktop screen the open sidebar covered its left edge -- and the two words
+    that matter, "Demo mode", were the ones hidden. The banner read as a note
+    about downloading a spreadsheet.
+    """
     st.markdown(
         """
 <style>
     .whr-demo-fw {
-        width: 100vw;
-        position: relative;
-        left: 50%;
-        right: 50%;
-        margin-left: -50vw;
-        margin-right: -50vw;
+        width: 100%;
         box-sizing: border-box;
         background: #fff3cd;
-        border-bottom: 1px solid #e6ca72;
-        padding: 0.55rem 1rem 0.6rem;
+        border: 1px solid #e6ca72;
+        border-radius: 6px;
+        padding: 0.7rem 1rem;
         font-size: 0.9rem;
         text-align: center;
         color: #1f2937;
         margin-bottom: 0.85rem;
     }
     .whr-demo-fw code { font-size: 0.85em; }
+    .whr-demo-how { display: block; margin-top: 0.35rem; font-size: 0.82rem; color: #4b5563; }
 </style>
 <div class="whr-demo-fw">
-<strong>Demo mode</strong> (<code>data/demo_whr.csv</code>). For production data, allow the app to download
-<code>WHR26_Data_Figure_2.1.xlsx</code>, place your own Excel under <code>data/</code>, or unset
-<code>WHR_NO_AUTO_DOWNLOAD</code> if you disabled automatic download.
+<strong>Demo mode: the numbers on this page are made up.</strong>
+They are a synthetic sample of 39 countries, built to show how the tool works.
+Do not read them as findings about wellbeing.
+<br>
+<strong>Modo demostraci&oacute;n: los n&uacute;meros de esta p&aacute;gina son inventados.</strong>
+Son una muestra sint&eacute;tica de 39 pa&iacute;ses, hecha para ense&ntilde;ar la herramienta.
+No sirven para sacar conclusiones sobre el bienestar.
+<span class="whr-demo-how">To load the real data: let the app download the official WHR workbook,
+or place your own Excel under <code>data/</code>.</span>
 </div>
         """,
         unsafe_allow_html=True,
@@ -264,12 +290,13 @@ def _detect_xlsx_kind(path: Path) -> Literal["legacy", "figure21"]:
 
 def _resolve_explicit_path() -> tuple[Path, Literal["legacy", "figure21"]] | None:
     candidates: list[str] = []
-    try:
-        p = st.secrets.get("data_path")
-        if p:
-            candidates.append(str(p))
-    except Exception:
-        pass
+    if _has_secrets_file():
+        try:
+            p = st.secrets.get("data_path")
+            if p:
+                candidates.append(str(p))
+        except Exception:
+            pass
     env = os.environ.get("WHR_DATA_PATH")
     if env:
         candidates.append(env)
