@@ -5,3 +5,6 @@ __pycache__/
 .venv/
 .env
 .streamlit/secrets.toml
+
+# El fichero oficial de la Figura 2.1 SI se versiona, con su procedencia en data/PROCEDENCIA.md
+!data/WHR26_Data_Figure_2.1.xlsx

@@ -40,3 +40,6 @@ Thumbs.db
 
 # R / rsconnect deployment metadata (local)
 **/rsconnect/
+
+# Excepcion: el fichero oficial de la Figura 2.1, con su procedencia al lado
+!world-happiness-streamlit/data/WHR26_Data_Figure_2.1.xlsx

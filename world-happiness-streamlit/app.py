@@ -399,7 +399,12 @@ def _attach_population_by_year(h: pd.DataFrame, pop: pd.DataFrame) -> pd.DataFra
 
     def attach(g: pd.DataFrame) -> pd.DataFrame:
         iso = g.name
-        sub = pop[pop["iso_a3"] == iso].sort_values("Year")
+        # Drop iso_a3 from the right-hand side before merging. Both frames carry
+        # it, so pandas would rename the pair to iso_a3_x / iso_a3_y and the
+        # column the choropleth reads would simply cease to exist. The failure
+        # only shows up when the population table actually loads, i.e. when the
+        # network works -- so the map broke on a good day and not on a bad one.
+        sub = pop[pop["iso_a3"] == iso].drop(columns=["iso_a3"]).sort_values("Year")
         g2 = g.sort_values("Year")
         if sub.empty:
             out = g2.copy()
